@@ -1,0 +1,187 @@
+<div class="table-container">
+  <table>
+    <thead>
+      <tr>
+        <th
+          *ngFor="let header of headerTable"
+          [ngStyle]="{ 'width.px': header.width ?? 'auto' }"
+        >
+          <div *ngIf="header.type === undefined; else columnasEspeciales">
+            {{ header.title }}
+            <!-- <i
+              class="fas fa-search fa-1x lupa search-icon"
+              *ngIf="header.filterType"
+            ></i> -->
+          </div>
+          <ng-template #columnasEspeciales>
+            <div [ngSwitch]="header.type">
+              <div *ngSwitchCase="'check'" class="check-column">
+                <input type="checkbox" />
+              </div>
+              <div *ngSwitchCase="'actions'"></div>
+              <div *ngSwitchCase="'boolean'">
+                {{ header.title }}
+              </div>
+              <div *ngSwitchCase="'color'">
+                {{ header.title }}
+              </div>
+            </div>
+          </ng-template>
+        </th>
+      </tr>
+      <tr>
+        <th *ngFor="let header of headerTable">
+          <div [ngSwitch]="header.filterType">
+            <div *ngSwitchCase="'string'">
+              <input
+                *ngIf="header.filterType"
+                type="text"
+                class="input-search-table"
+                (keyup)="
+                  onChangeHeaderFilter(
+                    header.filterType,
+                    header.dataIndex,
+                    $event
+                  )
+                "
+              />
+            </div>
+            <div *ngSwitchCase="'date'">
+              <input
+                type="date"
+                class="input-search-date-table text-center"
+                (change)="
+                  onChangeHeaderFilter(
+                    header.filterType,
+                    header.dataIndex,
+                    $event
+                  )
+                "
+              />
+            </div>
+            <div *ngSwitchCase="'time'">
+              <input
+                type="time"
+                class="input-search-date-table text-center"
+                (change)="
+                  onChangeHeaderFilter(
+                    header.filterType,
+                    header.dataIndex,
+                    $event
+                  )
+                "
+              />
+            </div>
+          </div>
+        </th>
+      </tr>
+    </thead>
+    <tbody *ngIf="dataTable.length > 0; else emptytable">
+      <tr *ngFor="let data of dataToTable">
+        <td *ngFor="let header of headerTable">
+          <div
+            *ngIf="header.type === undefined; else columnasEspeciales"
+            [ngClass]="{
+              'text-end': header?.align === 'right',
+              'text-center': header?.align === 'center',
+              'text-start': header?.align === 'left'
+            }"
+          >
+            {{ data[header.dataIndex] }}
+          </div>
+          <ng-template #columnasEspeciales>
+            <div [ngSwitch]="header.type">
+              <div *ngSwitchCase="'check'" class="check-column">
+                <input
+                  type="checkbox"
+                  [checked]="elementsChecked.includes(data.key)"
+                />
+              </div>
+              <div *ngSwitchCase="'actions'" class="row">
+                <div
+                  *ngFor="let actionObject of header.actions"
+                  [ngSwitch]="actionObject.action"
+                  class="col text-center"
+                >
+                  <button
+                    class="btn btn-icon-end text-dark"
+                    *ngSwitchCase="'edit'"
+                    (click)="contexto[actionObject?.function](data.key, modal)"
+                  >
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button
+                    class="btn btn-icon-end text-dark"
+                    *ngSwitchCase="'delete'"
+                    (click)="contexto[actionObject?.function](data.key)"
+                  >
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
+              </div>
+              <div *ngSwitchCase="'boolean'" class="text-center">
+                <div
+                  *ngIf="data[header.dataIndex]; else elsetag"
+                  class="card-boolean-col card-boolean-true"
+                >
+                  Sí
+                </div>
+                <ng-template #elsetag>
+                  <div class="card-boolean-col card-boolean-false">No</div>
+                </ng-template>
+              </div>
+              <div
+                *ngSwitchCase="'color'"
+                class="color-column"
+                (click)="copyTextToClipboard(data[header.dataIndex])"
+                data-bs-toggle="tooltip"
+                title="Copiar color"
+              >
+                <div
+                  class="box-color"
+                  [ngStyle]="{ 'background-color': data[header.dataIndex] }"
+                ></div>
+                &nbsp;{{ data[header.dataIndex] }}
+              </div>
+            </div>
+          </ng-template>
+        </td>
+      </tr>
+    </tbody>
+    <ng-template #emptytable>
+      <tbody>
+        <tr>
+          <td [colSpan]="headerTable.length">
+            <div class="empty-table-row">{{ emptyTableText }}</div>
+          </td>
+        </tr>
+      </tbody>
+    </ng-template>
+  </table>
+</div>
+<div class="pagination-container" *ngIf="paginationActive">
+  <div class="d-flex align-items-center ms-4">
+    <label for="pageSizeSelect" class="me-2">Elementos por página:</label>
+    <div>
+      <select
+        class="form-select w-auto"
+        id="pageSizeSelect"
+        [(ngModel)]="defaultPageSize"
+        (change)="changePaginationSize($event)"
+      >
+        <option *ngFor="let size of pageSizes" [value]="size">
+          {{ size }}
+        </option>
+      </select>
+    </div>
+  </div>
+  <div class="d-flex justify-content-center">
+    <ngb-pagination
+      [page]="defaultPage"
+      [pageSize]="defaultPageSize"
+      [collectionSize]="dataTable.length"
+      class="pe-4"
+      (pageChange)="changePage($event)"
+    ></ngb-pagination>
+  </div>
+</div>

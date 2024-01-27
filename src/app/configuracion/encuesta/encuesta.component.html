@@ -1,0 +1,464 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div>
+        <h2 class="card-body text-start">
+          <b style="color: black; font-size: xx-large">Encuestas</b>
+          <div class="text-end">
+            <button type="button" (click)="exportToExcel()" class="mr-10 fz-14 btn btn-export"
+              style="margin-right: 20px; width: 10%; font-size: 14px" *ngIf="btn_exportar?.visualizar"
+              [disabled]="!permisos?.exportar || !btn_exportar?.habilitar">
+              <i class="fas fa-file-excel"></i> Exportar
+            </button>
+            <button type="button" class="btn btn-amarillo btn-icon-end" (click)="openModal(content)"
+              style="margin-right: 10px; width: 10%; font-size: 14px" *ngIf="btn_agregar?.visualizar"
+              [disabled]="!permisos?.nuevo || !btn_agregar?.habilitar">
+              <i class="fas fa-plus fs-3 me-1"></i>Agregar
+            </button>
+          </div>
+        </h2>
+      </div>
+      <ng-template #content let-modal>
+        <div class="modal-header">
+          <h2 class="modal-title">
+            <b style="color: black; font-size: xx-large">Crear Encuesta</b>
+          </h2>
+          <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <div class="row" style="margin-bottom: 20px">
+              <div class="col-md-8" style="width: 76%">
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="nombre"
+                    style="color: black; background-color: #f3f5f7; width: 18%">Nombre</label>
+                  <input maxlength="300" class="form-control" type="text" formControlName="nombre" id="nombre"
+                    placeholder="nombre" style="width: 65%" maxlength="300" *ngIf="txt_nombre?.visualizar"
+                    [disabled]="!permisos?.modificar || !txt_nombre?.habilitar" />
+                </div>
+              </div>
+              <div class="col-md-4" style="width: 24%">
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="estado"
+                    style="color: black; background-color: #f3f5f7">Estado</label>
+                  <div class="form-check form-switch" style="padding-left: 20px">
+                    <input style="
+                        color: black;
+                        margin-left: 0px;
+                        width: 55px;
+                        margin-top: 8px;
+                      " id="estado" size="10" class="form-check-input" type="checkbox"
+                      [checked]="form.get('estado').value === 'A'" (change)="onEstadoChange($event)"
+                      *ngIf="cck_estado?.visualizar" [disabled]="
+                        !permisos?.modificar || !cck_estado?.habilitar
+                      " />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row" style="margin-bottom: 20px">
+              <div class="col-md-6">
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="destinatario"
+                    style="color: black; background-color: #f3f5f7">Tipo Compañía</label>
+                  <select style="text-align: center" id="tipoArchivo" class="form-select fz-10"
+                    (change)="onTipoCompaniaChange($event)" *ngIf="cmb_tipo_campania?.visualizar" [disabled]="
+                      !permisos?.modificar || !cmb_tipo_campania?.habilitar
+                    ">
+                    <option hidden>Selecccione</option>
+                    <ng-container *ngFor="let campania of catalogoCampanias">
+                      <option *ngIf="campania.estado === 'A'" [value]="campania.id">
+                        {{ campania.nombre }}
+                      </option>
+                    </ng-container>
+                  </select>
+                </div>
+                <div style="text-align: center" *ngIf="
+                    form.controls.id_tipo_campania.invalid &&
+                    (form.controls.id_tipo_campania.dirty ||
+                      form.controls.id_tipo_campania.touched)
+                  ">
+                  <small class="text-primary" *ngIf="form.controls.destinatario.errors.required">Información
+                    requerida.</small>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="copia"
+                    style="color: black; background-color: #f3f5f7; width: 21%">Plantilla</label>
+                  <select style="text-align: center" id="plantilla" class="form-select fz-10"
+                    (change)="onPlantillaChange($event)" *ngIf="cmb_plantilla?.visualizar" [disabled]="
+                      !permisos?.modificar || !cmb_plantilla?.habilitar
+                    ">
+                    <option hidden>Selecccione</option>
+                    <ng-container *ngFor="let plantilla of catalogoPlantillas">
+                      <option *ngIf="plantilla.estado === 'A'" [value]="plantilla.id">
+                        {{ plantilla.titulo }}
+                      </option>
+                    </ng-container>
+                  </select>
+                </div>
+                <div style="text-align: center" *ngIf="
+                    form.controls.id_plantilla.invalid &&
+                    (form.controls.id_plantilla.dirty ||
+                      form.controls.id_plantilla.touched)
+                  ">
+                  <small class="text-primary">Información Requerida.</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="row" style="margin-bottom: 20px">
+              <div class="col-md-5">
+                <div class="input-group mb-3">
+                  <app-date-picker label="Fecha inicio:" [value]="fecha_inicio" (change)="onFechaDesdeChange($event)"
+                    *ngIf="dpk_fecha_inicio?.visualizar" [disabled]="
+                      !permisos?.modificar || !dpk_fecha_inicio?.habilitar
+                    "></app-date-picker>
+                </div>
+              </div>
+              <div class="col-md-5">
+                <div class="input-group mb-3">
+                  <app-date-picker label="Fecha fin:" [value]="fecha_fin" (change)="onFechaHastaChange($event)"
+                    *ngIf="dpk_fecha_fin?.visualizar" [disabled]="
+                      !permisos?.modificar || !dpk_fecha_fin?.habilitar
+                    "></app-date-picker>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="habilitar_noaceptar"
+                    style="color: black; background-color: #f3f5f7">No aceptar</label>
+                  <div class="form-check form-switch" style="padding-left: 20px">
+                    <input style="
+                        color: black;
+                        margin-left: 0px;
+                        width: 55px;
+                        margin-top: 8px;
+                      " id="estado" size="10" class="form-check-input" type="checkbox"
+                      [checked]="form.get('habilitar_noaceptar').value === true"
+                      (change)="onEstadoNoAceptarChange($event)" *ngIf="cck_habilita_noaceptar?.visualizar" [disabled]="
+                        !permisos?.modificar ||
+                        !cck_habilita_noaceptar?.habilitar
+                      " />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" (click)="modal.dismiss()" *ngIf="btn_cancelar?.visualizar"
+                [disabled]="!permisos?.modificar || !btn_cancelar?.habilitar">
+                Cancelar
+              </button>
+              <button type="submit" class="btn btn-amarillo" [disabled]="!form.valid" *ngIf="btn_guardar?.visualizar"
+                [disabled]="!permisos?.modificar || !btn_guardar?.habilitar">
+                Guardar
+              </button>
+            </div>
+          </form>
+        </div>
+      </ng-template>
+      <app-loading-overlay *ngIf="isLoading"></app-loading-overlay>
+      <div class="d-flex flex-row align-items-center" style="overflow: auto; padding-left: 10px; padding-right: 10px">
+        <table aria-label class="table table-striped border mt-4" style="table-layout: fixed">
+          <thead>
+            <tr style="font-size: 12.5px; color: black; font-weight: 600">
+              <th style="
+                  font-weight: 600;
+                  width: 15%;
+                  text-align: center;
+                  vertical-align: middle;
+                ">
+                Nombre
+              </th>
+              <th style="
+                  font-weight: 600;
+                  width: 6%;
+                  text-align: center;
+                  vertical-align: middle;
+                ">
+                No Aceptar
+              </th>
+              <th style="
+                  font-weight: 600;
+                  width: 14%;
+                  text-align: center;
+                  vertical-align: middle;
+                ">
+                Fecha Inicio
+              </th>
+              <th style="
+                  font-weight: 600;
+                  width: 5%;
+                  text-align: center;
+                  vertical-align: middle;
+                ">
+                Fecha Fin
+              </th>
+              <th style="
+                  font-weight: 600;
+                  width: 5%;
+                  text-align: center;
+                  vertical-align: middle;
+                ">
+                Estado
+              </th>
+              <th style="
+                  font-weight: 600;
+                  width: 11%;
+                  text-align: center;
+                  vertical-align: middle;
+                ">
+                Acciones
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr id="{{ catalogoTipoRegistro.id }}" style="
+                text-align: center;
+                font-size: 12.5px;
+                vertical-align: middle;
+              " *ngFor="
+                let encuesta of catalogoTipoRegistro
+                  | slice
+                    : (cpage - 1) * cpageSize
+                    : (cpage - 1) * cpageSize + cpageSize
+              ">
+              <td style="word-wrap: break-word">
+                <ng-container>{{ encuesta.nombre }}</ng-container>
+              </td>
+              <td class="center-content">
+                <div class="form-check form-switch">
+                  <input type="checkbox" [checked]="encuesta.habilitar_noaceptar === true" class="form-check-input"
+                    disabled style="width: 40px" />
+                </div>
+              </td>
+              <td>
+                <ng-container>{{
+                  encuesta.fecha_inicio.split("T")[0]
+                  }}</ng-container>
+              </td>
+              <td>
+                <ng-container>{{
+                  encuesta.fecha_fin.split("T")[0]
+                  }}</ng-container>
+              </td>
+              <td class="center-content">
+                <div class="form-check form-switch center-content" style="width: 50%">
+                  <input type="checkbox" [checked]="encuesta.estado === 'A'" class="form-check-input" disabled
+                    style="width: 40px" />
+                </div>
+              </td>
+              <td>
+                <button (click)="onEdit(encuesta, editModal)" type="button" class="btn btn-icon-end"
+                  style="color: black" *ngIf="permisos?.modificar">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button type="button" (click)="onDelete(encuesta)" class="btn btn-icon-end" style="color: black"
+                  *ngIf="permisos?.eliminar">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ng-template #editModal let-modal>
+        <div class="modal-header">
+          <h2 class="modal-title">
+            <b style="color: black; font-size: xx-large">Editar Encuesta</b>
+          </h2>
+          <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="form">
+            <div class="row" style="margin-bottom: 20px">
+              <div class="col-md-6" style="width: 76%">
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="nombre"
+                    style="color: black; background-color: #f3f5f7; width: 18%" *ngIf="txt_nombre_edit?.visualizar"
+                    [disabled]="
+                      !permisos?.modificar || !txt_nombre_edit?.habilitar
+                    ">Nombre</label>
+                  <input maxlength="300" type="text" formControlName="nombre" class="form-control" id="nombre"
+                    [(ngModel)]="selectedTipoArchivo.nombre" style="width: 65%" />
+                </div>
+              </div>
+              <div class="col-md-6" style="width: 24%">
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="estado" style="color: black; background-color: #f3f5f7"
+                    *ngIf="cck_estado_edit?.visualizar" [disabled]="
+                      !permisos?.modificar || !cck_estado_edit?.habilitar
+                    ">Estado</label>
+                  <div class="form-check form-switch" style="padding-left: 20px">
+                    <input formControlName="estado" style="
+                        color: black;
+                        margin-left: 0px;
+                        width: 55px;
+                        margin-top: 8px;
+                      " id="estado" size="10" class="form-check-input" type="checkbox"
+                      (change)="onEstadoChangeEdit($event)" maxlength="300" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row" style="margin-bottom: 20px">
+              <div class="col-md-6">
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="destinatario"
+                    style="color: black; background-color: #f3f5f7">Tipo Compañía</label>
+                  <select style="text-align: center" id="tipoArchivo" class="form-select fz-10"
+                    (change)="onTipoCompaniaChange($event)" formControlName="id_tipo_campania"
+                    *ngIf="cmb_tipo_campania_edit?.visualizar" [disabled]="
+                      !permisos?.modificar || !cmb_tipo_campania_edit?.habilitar
+                    ">
+                    <option hidden>Selecccione</option>
+                    <ng-container *ngFor="let campania of catalogoCampanias">
+                      <option *ngIf="campania.estado === 'A'" [value]="campania.id">
+                        {{ campania.nombre }}
+                      </option>
+                    </ng-container>
+                  </select>
+                </div>
+                <div style="text-align: center" *ngIf="
+                    form.controls.id_tipo_campania.invalid &&
+                    (form.controls.id_tipo_campania.dirty ||
+                      form.controls.id_tipo_campania.touched)
+                  ">
+                  <small class="text-primary" *ngIf="form.controls.destinatario.errors.required">Información
+                    requerida.</small>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="copia"
+                    style="color: black; background-color: #f3f5f7; width: 21%">Plantilla</label>
+                  <select style="text-align: center" id="plantilla" class="form-select fz-10"
+                    (change)="onPlantillaChange($event)" formControlName="id_plantilla"
+                    *ngIf="cmb_plantilla_edit?.visualizar" [disabled]="
+                      !permisos?.modificar || !cmb_plantilla_edit?.habilitar
+                    ">
+                    <option hidden>Selecccione</option>
+                    <ng-container *ngFor="let plantilla of catalogoPlantillas">
+                      <option *ngIf="plantilla.estado === 'A'" [value]="plantilla.id">
+                        {{ plantilla.titulo }}
+                      </option>
+                    </ng-container>
+                  </select>
+                </div>
+                <div style="text-align: center" *ngIf="
+                    form.controls.id_plantilla.invalid &&
+                    (form.controls.id_plantilla.dirty ||
+                      form.controls.id_plantilla.touched)
+                  ">
+                  <small class="text-primary">Información Requerida.</small>
+                </div>
+              </div>
+            </div>
+            <!-- <div class="row" style="margin-bottom: 20px;">
+                <div class="col-md-6">
+                  <div class="input-group mb-3">
+                    <label class="input-group-text" for="destinatario" style="color: crimson;background: white;">Correo
+                      destinatario</label>
+                    <input type="text" formControlName="destinatario" class="form-control" id="destinatario"
+                      [(ngModel)]="selectedTipoArchivo.destinatario">
+                  </div>
+                  <div style="text-align: center;"
+                    *ngIf="form.controls.destinatario.invalid && (form.controls.destinatario.dirty || form.controls.destinatario.touched)">
+                    <small class="text-danger" *ngIf="form.controls.destinatario.errors.required">El correo del
+                      destinatario es requerido.</small>
+                    <small class="text-danger" *ngIf="form.controls.destinatario.errors.invalidEmail">Por favor, introduce
+                      un correo electrónico válido.</small>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="input-group mb-3">
+                    <label class="input-group-text" for="copia"
+                      style="color: crimson;background: white;width: 21%;">CC</label>
+                    <input type="text" formControlName="copia" class="form-control" id="copia"
+                      [(ngModel)]="selectedTipoArchivo.copia">
+                  </div>
+                  <div style="text-align: center;"
+                    *ngIf="form.controls.copia.invalid && (form.controls.copia.dirty || form.controls.copia.touched)">
+                    <small class="text-danger" *ngIf="form.controls.copia.errors.multiEmail">Por favor, introduce correos
+                      electrónicos válidos separados por coma (,).</small>
+                  </div>
+                </div>
+              </div> -->
+            <div class="row" style="margin-bottom: 20px">
+              <div class="col-md-5">
+                <div class="input-group mb-3">
+                  <app-date-picker label="Fecha inicio:" [value]="fecha1" (change)="onFechaDesdeChange($event)"
+                    *ngIf="dpk_fecha_inicio_edit?.visualizar" [disabled]="
+                      !permisos?.modificar || !dpk_fecha_inicio_edit?.habilitar
+                    "></app-date-picker>
+                </div>
+              </div>
+              <div class="col-md-5">
+                <div class="input-group mb-3">
+                  <app-date-picker label="Fecha fin:" [value]="fecha2" (change)="onFechaHastaChange($event)"
+                    *ngIf="dpk_fecha_fin_edit?.visualizar" [disabled]="
+                      !permisos?.modificar || !dpk_fecha_fin_edit?.habilitar
+                    "></app-date-picker>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="habilitar_noaceptar"
+                    style="color: black; background-color: #f3f5f7">No aceptar</label>
+                  <div class="form-check form-switch" style="padding-left: 20px">
+                    <input style="
+                        color: black;
+                        margin-left: 0px;
+                        width: 55px;
+                        margin-top: 8px;
+                      " id="estado" size="10" class="form-check-input" type="checkbox"
+                      [checked]="form.get('habilitar_noaceptar').value === true"
+                      (change)="onEstadoNoAceptarChange($event)" *ngIf="cck_habilita_noaceptar_edit?.visualizar"
+                      [disabled]="
+                        !permisos?.modificar ||
+                        !cck_habilita_noaceptar_edit?.habilitar
+                      " />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" (click)="modal.dismiss()"
+                *ngIf="btn_cancelar_edit?.visualizar" [disabled]="
+                  !permisos?.modificar || !btn_cancelar_edit?.habilitar
+                ">
+                Cancelar
+              </button>
+              <button type="button" class="btn btn-amarillo" [disabled]="!form.valid" (click)="
+                  onEstadoChangeEdit(form.controls['estado'].value);
+                  onSave(selectedTipoArchivo)
+                " *ngIf="btn_guardar_edit?.visualizar" [disabled]="
+                  !permisos?.modificar || !btn_guardar_edit?.habilitar
+                ">
+                Guardar cambios
+              </button>
+            </div>
+          </form>
+        </div>
+      </ng-template>
+      <div class="d-flex justify-content-between align-items-center p-2">
+        <div class="d-flex align-items-center ms-4">
+          <label for="pageSizeSelect" class="me-2">Vista:</label>
+          <div>
+            <select class="form-select w-auto" id="pageSizeSelect" [(ngModel)]="cpageSize">
+              <option [ngValue]="4">4</option>
+              <option [ngValue]="10">10</option>
+              <option [ngValue]="15">15</option>
+              <option [ngValue]="25">25</option>
+            </select>
+          </div>
+        </div>
+        <div class="d-flex justify-content-center">
+          <ngb-pagination [(page)]="cpage" [maxSize]="10" [pageSize]="cpageSize"
+            [collectionSize]="catalogoTipoRegistro.length" class="pe-4"></ngb-pagination>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

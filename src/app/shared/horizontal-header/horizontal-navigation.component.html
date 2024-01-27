@@ -1,0 +1,225 @@
+<!-- ============================================================== -->
+<!-- toggle and nav items -->
+<!-- ============================================================== -->
+<ul class="navbar-nav float-start">
+  <li class="nav-item d-none d-lg-block">
+    <a
+      (click)="toggleSidebar.emit()"
+      class="nav-link sidebartoggler waves-effect waves-light"
+      href="javascript:void(0)"
+    >
+      <i class="ti-menu"></i>
+    </a>
+  </li>
+
+  <!-- ============================================================== -->
+  <!-- Comment -->
+  <!-- ============================================================== -->
+  <li class="nav-item dropdown" ngbDropdown placement="bottom-start">
+    <a
+     
+    >
+      <i class="fas fa-bell"></i>
+      <div class="notify">
+        <span class="heartbit"></span> <span class="point"></span>
+      </div>
+    </a>
+    <div
+      class="dropdown-menu dropdown-menu-start mailbox dropdown-menu-animate-up"
+      ngbDropdownMenu
+    >
+      <ul class="list-style-none">
+        <li>
+          <div class="drop-title bg-primary text-white;">
+            <h4 class="mb-0 mt-1 text-white">Nuev</h4>
+            <span class="fw-light">Notificacion</span>
+          </div>
+        </li>
+        <li>
+          <div class="message-center notifications" [perfectScrollbar]="config">
+            <!-- Message -->
+            <a
+              href="javascript:void(0)"
+              class="message-item border-bottom d-block text-decoration-none"
+              *ngFor="let notification of notifications"
+            >
+              <span
+                class="btn btn-circle rounded-circle {{ notification.btn }}"
+              >
+                <i class="{{ notification.icon }}"></i>
+              </span>
+              <span class="mail-contnet d-inline-block w-75 ps-2 align-middle">
+                <h5 class="message-title">{{ notification.title }}</h5>
+                <span class="mail-desc fs-2 d-block text-muted text-truncate">{{
+                  notification.subject
+                }}</span>
+                <span class="time fs-2 d-block text-muted text-truncate">{{
+                  notification.time
+                }}</span>
+              </span>
+            </a>
+          </div>
+        </li>
+        <li>
+          <a class="link text-center mb-1" href="javascript:void(0);">
+            <strong>Check all notifications</strong>
+            <i class="fa fa-angle-right ms-2"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </li>
+  <!-- ============================================================== -->
+  <!-- End Comment -->
+  <!-- ============================================================== -->
+  <!-- ============================================================== -->
+  <!-- Messages -->
+  <!-- ============================================================== -->
+  <li class="nav-item dropdown" ngbDropdown placement="bottom-start">
+    <a
+      ngbDropdownToggle
+      class="nav-link dropdown-toggle waves-effect waves-dark"
+      href="javascript:void(0)"
+      id="2"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <i class="icon icon-envelope"></i>
+      <div class="notify">
+        <span class="heartbit"></span> <span class="point"></span>
+      </div>
+    </a>
+    <div
+      class="dropdown-menu dropdown-menu-start mailbox dropdown-menu-animate-up"
+      aria-labelledby="2"
+      ngbDropdownMenu
+    >
+      <ul class="list-style-none">
+        <li>
+          <div class="drop-title text-white bg-danger">
+            <h4 class="mb-0 mt-1 text-white">5 New</h4>
+            <span class="fw-light">Messages</span>
+          </div>
+        </li>
+        <li>
+          <div class="message-center message-body" [perfectScrollbar]="config">
+            <!-- Message -->
+            <a
+              href="javascript:void(0)"
+              class="message-item border-bottom d-block text-decoration-none"
+              *ngFor="let mymessage of mymessages"
+            >
+              <span class="user-img position-relative d-inline-block">
+                <img
+                  src="{{ mymessage.useravatar }}"
+                  alt="user"
+                  class="rounded-circle"
+                />
+                <span
+                  class="profile-status rounded-circle d-inline-block {{
+                    mymessage.status
+                  }} float-end"
+                ></span>
+              </span>
+              <span class="mail-contnet d-inline-block w-75 ps-2 align-middle">
+                <h5 class="message-title">{{ mymessage.from }}</h5>
+                <span class="mail-desc fs-2 d-block text-muted text-truncate">{{
+                  mymessage.subject
+                }}</span>
+                <span class="time fs-2 d-block text-muted text-truncate">{{
+                  mymessage.time
+                }}</span>
+              </span>
+            </a>
+          </div>
+        </li>
+        <li>
+          <a class="text-center link" href="javascript:void(0);">
+            <b>See all e-Mails</b>
+            <i class="fa fa-angle-right ms-2"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </li>
+  <!-- ============================================================== -->
+  <!-- End Messages -->
+  <!-- ============================================================== -->
+  <!-- ============================================================== -->
+  <!-- mega menu -->
+  <!-- ============================================================== -->
+
+
+  <!-- ============================================================== -->
+  <!-- End mega menu -->
+  <!-- ============================================================== -->
+</ul>
+
+<!-- Navbar Header for horizontal only -->
+<div class="navbar-header d-none d-lg-flex justify-content-center">
+  <!-- This is for the sidebar toggle which is visible on mobile only -->
+  <a
+    (click)="showMobileMenu = !showMobileMenu"
+    class="nav-toggler waves-effect waves-light d-block d-lg-none"
+    href="javascript:void(0)"
+  >
+    <i [ngClass]="showMobileMenu ? 'ti-close' : 'ti-menu'"></i>
+  </a>
+  <!-- ============================================================== -->
+  <!-- Logo -->
+  <!-- ============================================================== -->
+  <a class="navbar-brand" href="/">
+    <!-- Logo icon -->
+    <b class="logo-icon">
+      <!--You can put here icon as well // <i class="wi wi-sunset"></i> //-->
+      <!-- Dark Logo icon -->
+      <img src="assets/images/logo-light-banco-amazonas-nuevo.png" alt="homepage" class="dark-logo" />
+      <!-- Light Logo icon -->
+      <img style="width:150px;"
+        src=" assets/images/logo completo - banco amazonas.png"
+        alt=""
+        class="light-logo"
+      />
+    </b>
+    <!--End Logo icon -->
+    <!-- Logo text -->
+    <span class="logo-text">
+      <!-- dark Logo text -->
+      <img src="assets/images/logo-light-banco-amazonas-nuevo.png" alt="homepage" class="dark-logo" />
+      <!-- Light Logo text -->
+      <img
+        src=""
+        class="light-logo"
+        alt=""
+      />
+    </span>
+  </a>
+  <!-- ============================================================== -->
+  <!-- End Logo -->
+  <!-- ============================================================== -->
+  <!-- ============================================================== -->
+  <!-- Toggle which is visible on mobile only -->
+  <!-- ============================================================== -->
+  <a
+    class="topbartoggler d-block d-lg-none waves-effect waves-light"
+    href="javascript:void(0)"
+    (click)="isCollapsed = !isCollapsed"
+    [attr.aria-expanded]="!isCollapsed"
+    data-target="#navbarSupportedContent"
+    aria-controls="navbarSupportedContent"
+  >
+    <i class="ti-more"></i>
+  </a>
+</div>
+
+<!-- ============================================================== -->
+<!-- Right side toggle and nav items -->
+<!-- ============================================================== -->
+<ul class="navbar-nav float-end">
+  <!-- ============================================================== -->
+  <!-- Search -->
+  <!-- ============================================================== -->
+ 
+ 
+</ul>

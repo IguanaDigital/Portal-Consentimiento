@@ -1,0 +1,10 @@
+<div class="auth-wrapper d-flex no-block justify-content-between align-items-flex-start" style="background:url(assets/images/Logoreybanpac.jpg) no-repeat center center/cover;">
+    <div class="overlay"></div>
+    <div class="greeting-container">
+        <h2 class="greeting">{{ greeting }}</h2>
+        <h1 class="username">{{ (name?.split('@')[0] || '')?.slice(0, 10) }}</h1>
+    </div>
+    <!--<div class="time-container">
+        <h5 class="time-container" >{{ date | date:'shortTime' }}</h5>
+    </div>-->
+  </div>

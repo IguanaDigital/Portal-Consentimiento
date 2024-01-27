@@ -1,0 +1,468 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div>
+        <h2 class="text-start p-3">
+          <div class="row">
+            <div class="col-md-3">
+              <b style="font-size: xx-large;">Procesos</b>
+            </div>
+            <div class="col-md-9 text-end">
+              <button *ngIf="permisos?.exportar && btn_exportar?.visualizar" (click)="exportToExcelProceso()" type="button"
+                class="mr-10 fz-14 btn btn-export" [disabled]="!btn_exportar?.habilitar">
+                <i class="fas fa-file-excel"></i> Exportar
+              </button>
+              <button *ngIf="permisos?.nuevo && btn_agregar?.visualizar" (click)="mostrarModalAgregarProceso()" type="button"
+                class="mr-10 fz-14 btn btn-amarillo btn-icon-end" [disabled]="!btn_agregar?.habilitar">
+                <i class="fas fa-plus"></i> Agregar
+              </button>
+            </div>
+          </div>
+        </h2>
+      </div>
+      <div class="d-flex flex-row align-items-center" style="overflow: auto;padding-left: 10px;padding-right: 10px;">
+        <app-loading-overlay *ngIf="isLoading"></app-loading-overlay>
+        <table aria-label class="table table-striped border mt-4" id="table-procesos">
+          <thead>
+            <tr style="font-size: 12.5px;font-weight: 600;">
+              <th style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">Código</th>
+              <th style="font-weight: 600;width: 20%;text-align: center;vertical-align: middle;">Nombre de proceso</th>
+              <th style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">Frecuencia</th>
+              <th style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">Días</th>
+              <th style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">Día único</th>
+              <th style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">Hora</th>
+              <th style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">Feriados</th>
+              <th style="font-weight: 600;width: 0%;text-align: center;vertical-align: middle;">Estado</th>
+              <th *ngIf="permisos?.modificar || permisos?.eliminar"
+                style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="text-align: center; font-size: 12.5px;vertical-align: middle;"
+              *ngFor="let procesos of dataProceso.slice((cpage-1) * cpageSize, cpage * cpageSize)">
+              <td class="reduce-width">
+                <ngb-highlight [result]="procesos.codigo"></ngb-highlight>
+              </td>
+              <td class="reduce-width">
+                <ngb-highlight [result]=" procesos.proceso"></ngb-highlight>
+              </td>
+              <td class="reduce-width">
+                <ngb-highlight [result]=" procesos.frecuencia "></ngb-highlight>
+              </td>
+              <td class="reduce-width">
+                {{ construirCadenaDias(procesos.diasemana.split(',')) }}
+              </td>
+              <td *ngIf="procesos.diasmes== 0" class="reduce-width">
+                <ngb-highlight [result]=" "></ngb-highlight>
+              </td>
+              <td *ngIf="procesos.diasmes!= 0" class="reduce-width">
+                <ngb-highlight [result]="procesos.diasmes "></ngb-highlight>
+              </td>
+              <td class="reduce-width">
+                <ngb-highlight [result]="procesos.hora  "></ngb-highlight>
+              </td>
+              <td class="reduce-width" *ngIf="procesos.aplica_feriado== true">Si</td>
+              <td class="reduce-width" *ngIf="procesos.aplica_feriado== false"> No</td>
+              <td class="center-content">
+                <div class="form-check form-switch">
+                  <input type="checkbox" [checked]="procesos.estado === 'A'" class="form-check-input" disabled
+                    style="width: 40px;">
+                </div>
+              </td>
+              <td>
+                <button *ngIf="permisos?.modificar && btn_editar?.visualizar" type="button" class="btn btn-icon-end" [disabled]="!btn_editar?.habilitar">
+                  <i class="fas fa-edit" style="color: black;"
+                    (click)="mostrarModalModificarProceso(procesos.id,procesos.codigo,
+                  procesos.proceso,procesos.frecuencia,procesos.hora,procesos.diasemana,procesos.diasmes,procesos.aplica_feriado,procesos.estado)"></i>
+                </button>
+                <button *ngIf="permisos?.eliminar && btn_eliminar?.visualizar" type="button" class="btn btn-icon-end" [disabled]="!btn_eliminar?.habilitar">
+                  <i class="fas fa-trash-alt" style="color: black;"
+                    (click)="onDeleteProceso(procesos.id)"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ng-template #myModalCrearProceso let-modal>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="card">
+                <div >
+                  <h2 class="card-body text-start">
+                    <div class="row">
+                      <div class="col-md-5">
+                        <b style="color: black;font-size: xx-large ; margin: 20px;">Crear Proceso</b>
+                      </div>
+                      <div class="col-md-7 text-end">
+                        <button type="button" (click)="modal.dismiss('Cross click')"
+                          class="mr-10 fz-14 btn btn-export" *ngIf="btn_cancelar?.visualizar" [disabled]="!btn_cancelar?.habilitar" >Cancelar
+                        </button>
+                        <button type="button" class="mr-10 fz-14 btn btn-amarillo btn-icon-end" (click)="onSaveProceso()"
+                          aria-label="Close" aria-label="Close" *ngIf="btn_guardar?.visualizar" [disabled]="!btn_guardar?.habilitar">
+                          <i class="fas fa-save"></i> Guardar
+                        </button>
+                      </div>
+                    </div>
+                    <div class="row"
+                      style="padding-top: 20px; display: flex; justify-content: space-evenly; margin: 10px;">
+                      <div class="col-md-4" style="width: 50%;" *ngIf="txt_codigo?.visualizar">
+                        <div class="input-group mb-3">
+                          <label class="input-text" for="decimal"
+                            style="padding-top:8px;  font-size: 15px;color: black;width: 31%; background-color: rgba(255, 255, 255, 0);">Código</label>
+                          <div style="width: 40%; padding-top:0px; ">
+                            <input oninput="this.value = this.value.replace(/[^A-Za-z0-9.]/g, '')" maxlength="5" style="  border-radius: 5px; border-color: rgb(192, 186, 184);"
+                              class="form-control" type="text" id="codigo" [disabled]="!txt_codigo?.habilitar || !txt_codigo?.modificar">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-4" style="width: 50%;" *ngIf="cmb_frecuencia?.visualizar">
+                        <div class="input-group mb-3">
+                          <label class="input-text"
+                            style="  padding-top:8px;  font-size: 15px;color: black;width: 30%; background-color: rgba(255, 255, 255, 0);">Frecuencia</label>
+                          <div style="width: 40%; padding-top:0px; ">
+                            <select style=" border-radius: 5px; border-color: rgb(192, 186, 184); text-align: center;"
+                              id="frecuencia" (change)="onFrecuenciaChange($event)" class="form-select fz-14" [disabled]="!cmb_frecuencia?.habilitar">
+                              <option value="" hidden>Selecccione</option>
+                              <option value="Diaria">Diario</option>
+                              <option value="Semanal">Semanal</option>
+                              <option value="Mensual">Mensual</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row"
+                      style="padding-top: 20px; display: flex; justify-content: space-evenly; margin: 10px;">
+                      <div class="col-md-4" style="width: 50%;" *ngIf="txt_nombre_proceso?.visualizar">
+                        <div class="input-group mb-3">
+                          <label class="input-text"
+                            style="padding-top: 10px;  font-size: 15px;color: black; width: 31%; background-color: rgba(255, 255, 255, 0);">Nombre del Proceso</label>
+                          <div style="width: 40%; padding-top:0px; ">
+                            <textarea maxlength="100" style="border-radius: 5px; border-color: rgb(192, 186, 184);"
+                              type="text" id="nombreProceso" [disabled]="!txt_nombre_proceso?.habilitar || !txt_nombre_proceso?.modificar" >
+                            </textarea>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-4" style="width: 50%;  ">
+                        <div class="col-md-4" style="width: 50%;" *ngIf="tipoFrecuenciaSeleccionado=='Diaria' && cck_dias?.visualizar " >
+                          <div class="input-group mb-3">
+                            <label class="input-text"
+                              style="  padding-top:8px;  font-size: 15px;color: black;width: 55%; background-color: rgba(255, 255, 255, 0);">Días</label>
+                            <div style="width: 40%;">
+                              <label style=" font-size: 12px; color: black;" size="10"><input class="form-check-input"
+                                  type="checkbox" id="lunes" [disabled]="!cck_dias?.habilitar"> Lunes</label>
+                              <label style=" font-size: 12px; color: black;" size="10"><input class="form-check-input"
+                                  type="checkbox" id="martes" [disabled]="!cck_dias?.habilitar"> Martes</label>
+                              <label style=" font-size: 12px; color: black;" size="10"><input class="form-check-input"
+                                  type="checkbox" id="miercoles" [disabled]="!cck_dias?.habilitar"> Miercoles</label>
+                              <label style=" font-size: 12px; color: black;" size="10"><input class="form-check-input"
+                                  type="checkbox" id="jueves" [disabled]="!cck_dias?.habilitar"> Jueves</label>
+                              <label style=" font-size: 12px; color: black;" size="10"><input class="form-check-input"
+                                  type="checkbox" id="viernes" [disabled]="!cck_dias?.habilitar"> Viernes</label>
+                              <label style=" font-size: 12px; color: black;" size="10"><input class="form-check-input"
+                                  type="checkbox" id="sabado" [disabled]="!cck_dias?.habilitar"> Sabado</label>
+                              <label style=" font-size: 12px; color: black;" size="10"><input class="form-check-input"
+                                  type="checkbox" id="domingo" [disabled]="!cck_dias?.habilitar"> Domingo</label>
+                            </div>
+
+                          </div>
+                        </div>
+                        <div class="col-md-4" style="width: 50%;" *ngIf="tipoFrecuenciaSeleccionado=='Semanal' &&cck_dias?.visualizar ">
+                          <div class="input-group mb-3">
+                            <label class="input-text"
+                              style="  padding-top:8px;  font-size: 15px;color: black;width: 55%; background-color: rgba(255, 255, 255, 0);">Días</label>
+                            <div style="width: 40%;">
+                              <label style=" font-size: 12px; color: black;" size="10"><input value="checkbox1"
+                                  [(ngModel)]="selectedCheckbox" (change)="onCheckboxChange('checkbox1')"
+                                  class="form-check-input" type="radio" id="lunes" [disabled]="!cck_dias?.habilitar"> Lunes</label>
+                              <label style=" font-size: 12px; color: black;" size="10"><input value="checkbox2"
+                                  [(ngModel)]="selectedCheckbox" (change)="onCheckboxChange('checkbox2')"
+                                  class="form-check-input" type="radio" id="martes" [disabled]="!cck_dias?.habilitar"> Martes</label>
+                              <label style=" font-size: 12px; color: black;" size="10"><input value="checkbox3"
+                                  [(ngModel)]="selectedCheckbox" (change)="onCheckboxChange('checkbox3')"
+                                  class="form-check-input" type="radio" id="miercoles" [disabled]="!cck_dias?.habilitar"> Miercoles</label>
+                              <label style=" font-size: 12px; color: black;" size="10"><input value="checkbox4"
+                                  [(ngModel)]="selectedCheckbox" (change)="onCheckboxChange('checkbox4')"
+                                  class="form-check-input" type="radio" id="jueves" [disabled]="!cck_dias?.habilitar"> Jueves</label>
+                              <label style=" font-size: 12px; color: black;" size="10"><input value="checkbox5"
+                                  [(ngModel)]="selectedCheckbox" (change)="onCheckboxChange('checkbox5')"
+                                  class="form-check-input" type="radio" id="viernes" [disabled]="!cck_dias?.habilitar"> Viernes</label>
+                              <label style=" font-size: 12px; color: black;" size="10"><input value="checkbox6"
+                                  [(ngModel)]="selectedCheckbox" (change)="onCheckboxChange('checkbox6')"
+                                  class="form-check-input" type="radio" id="sabado" [disabled]="!cck_dias?.habilitar"> Sabado</label>
+                              <label style=" font-size: 12px; color: black;" size="10"><input value="checkbox7"
+                                  [(ngModel)]="selectedCheckbox" (change)="onCheckboxChange('checkbox7')"
+                                  class="form-check-input" type="radio" id="domingo" [disabled]="!cck_dias?.habilitar"> Domingo</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-4" style="width: 80%;" *ngIf="tipoFrecuenciaSeleccionado=='Mensual' &&txt_dia?.visualizar ">
+                          <div class="input-group mb-3">
+                            <label class="input-text"
+                              style="  padding-top:15px;  font-size: 15px;color: black;width: 38%; background-color: rgba(255, 255, 255, 0);">Día
+                              único</label>
+                            <div style="width: 14%; padding-top:0px; ">
+                              <input maxlength="2" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                style="  border-radius: 5px; border-color: rgb(192, 186, 184);" class="form-control"
+                                type="text" id="diaUnico" [disabled]="!txt_dia?.habilitar || !txt_dia?.modificar">
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row" style="padding-top: 0px;" *ngIf="cck_aplica_feriado?.visualizar">
+                      <div class="col-md-4" style="width: 50%;">
+                        <div class="input-group mb-3">
+                          <label class="input-text" for="feriado"
+                            style="   font-size: 15px;color: black;margin-left: 20px; background-color: rgba(255, 255, 255, 0);">Aplicar
+                            en feriado</label>
+                          <div class="form-check form-switch" style="width: 30%; padding-top: 1px; ">
+                            <input style=" font-size: 12px; color: black;  " id="aplicaFeriado" checked size="10"
+                              class="form-check-input" type="checkbox" [disabled]="!cck_aplica_feriado?.habilitar">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-4" style="width: 50%;" *ngIf="cck_estado?.visualizar">
+                      <div class="input-group mb-3">
+                        <label class="input-text" for="estado"
+                          style="   font-size: 15px;color: black;margin-left: 20px; background-color: rgba(255, 255, 255, 0);">Estado</label>
+                        <div class="form-check form-switch" style="width: 30%; padding-top: 1px; ">
+                          <input style=" font-size: 12px; color: black;  " id="estado" checked size="10"
+                            class="form-check-input" type="checkbox" [disabled]="!cck_estado?.habilitar">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="d-flex flex-row align-items-center"
+                      style="overflow: auto;padding-left: 20px;padding-right: 10px;">
+                      <div class="col-md-4" style="width: 50%;" *ngIf="txt_hora?.visualizar">
+                        <div class="input-group mb-3">
+                          <label class="input-text"
+                            style=" margin-top: 12px;  padding-top: 10px;  font-size: 15px;color: black; width: 31%; background-color: rgba(255, 255, 255, 0);">Hora</label>
+                          <div style="width: 50%; padding-top:0px;margin-top: 12px; ">
+                            <input disabled style="  border-radius: 5px; border-color: rgb(192, 186, 184);"
+                              [(ngModel)]="valorCampoTexto" class="form-control" type="text" id="hora">
+                          </div>
+                        </div>
+                      </div>
+                      <ngb-timepicker style="padding-left: 5px;padding-right: 5px; margin-left: -60px;" *ngIf="tpk_hora?.visualizar" [disabled]="!tpk_hora?.habilitar"
+                        [(ngModel)]="horaSeleccionada" ></ngb-timepicker>
+                      <button style="padding: top 2px;" type="button" (click)="onAgregarHora()" *ngIf="btn_incluir?.visualizar" [disabled]="!btn_incluir?.habilitar"
+                        class="btn-sm btn btn-amarillo "><i class="fas fa-plus"></i></button>
+                    </div>
+                  </h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+        <ng-template #myModalModificarProceso let-modal>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="card">
+                <div>
+                  <h2 class="card-body text-start">
+                    <div class="row">
+                      <div class="col-md-5">
+                        <b style="color: black;font-size: xx-large ; margin: 20px;">Modificar Proceso</b>
+                      </div>
+                      <div class="col-md-7 text-end">
+                        <button type="button" (click)="modal.dismiss('Cross click')"
+                          class="mr-10 fz-14 btn btn-export" *ngIf="btn_cancelar_edit?.visualizar" [disabled]="!btn_cancelar_edit?.habilitar" >Cancelar
+                        </button>
+                        <button type="button" class="mr-10 fz-14 btn btn-amarillo btn-icon-end"
+                          (click)='onUpdateProceso(id)' aria-label="Close" aria-label="Close" *ngIf="btn_guardar_edit?.visualizar" [disabled]="!btn_guardar_edit?.habilitar">
+                          <i class="fas fa-save"></i> Guardar
+                        </button>
+                      </div>
+                    </div>
+                    <div class="row"
+                      style="padding-top: 20px; display: flex; justify-content: space-evenly; margin: 10px;">
+                      <div class="col-md-4" style="width: 50%;" *ngIf="txt_codigo_edit?.visualizar">
+                        <div class="input-group mb-3">
+                          <label class="input-text" for="decimal"
+                            style="  padding-top:8px;  font-size: 15px;color: black;width: 31%; background-color: rgba(255, 255, 255, 0);">Código</label>
+                          <div style="width: 40%; padding-top:0px; ">
+                            <input oninput="this.value = this.value.replace(/[^A-Za-z0-9.]/g, '')" maxlength="5" style="  border-radius: 5px; border-color: rgb(192, 186, 184);"
+                              class="form-control" [value]="codigo" type="text" id="codigoM" [disabled]="!txt_codigo_edit?.habilitar || !txt_codigo_edit?.modificar">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-4" style="width: 50%;" *ngIf="cmb_frecuencia_edit?.visualizar">
+                        <div class="input-group mb-3">
+                          <label class="input-text"
+                            style="  padding-top:8px;  font-size: 15px;color: black;width: 30%; background-color: rgba(255, 255, 255, 0);">Frecuencia</label>
+                          <div style="width: 40%; padding-top:0px; ">
+                            <select [(ngModel)]="tipoFrecuenciaSeleccionado"
+                              style=" border-radius: 5px; border-color: rgb(192, 186, 184); text-align: center;"
+                              id="frecuenciaM" (change)="onFrecuenciaChange($event)" class="form-select fz-14" [disabled]="!cmb_frecuencia_edit?.habilitar">
+                              <option value="" hidden>Selecccione</option>
+                              <option value="Diaria">Diario</option>
+                              <option value="Semanal">Semanal</option>
+                              <option value="Mensual">Mensual</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row"
+                      style="padding-top: 20px; display: flex; justify-content: space-evenly; margin: 10px;">
+                      <div class="col-md-4" style="width: 50%;" *ngIf="txt_nombre_proceso_edit?.visualizar">
+                        <div class="input-group mb-3">
+                          <label class="input-text"
+                            style="  padding-top: 10px;  font-size: 15px;color: black; width: 31%; background-color: rgba(255, 255, 255, 0);">Nombre
+                            de Proceso</label>
+                          <div style="width: 40%; padding-top:0px; ">
+                            <textarea maxlength="100" style="  border-radius: 5px; border-color: rgb(192, 186, 184);"
+                              class="form-control" [value]="proceso" type="text" id="nombreProcesoM" [disabled]="!txt_nombre_proceso_edit?.habilitar || !txt_nombre_proceso_edit?.modificar">
+                              </textarea>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-4" style="width: 50%;  ">
+                        <div class="col-md-4" style="width: 50%;" *ngIf="  tipoFrecuenciaSeleccionado=='Diaria' && cck_dias_edit?.visualizar">
+                          <div class="input-group mb-3">
+                            <label class="input-text"
+                              style="  padding-top:8px;  font-size: 15px;color: black;width: 55%; background-color: rgba(255, 255, 255, 0);">Días</label>
+                            <div style="width: 40%;">
+                              <label style=" font-size: 12px; color: black;  " id="asignarRol" size="10"><input
+                                  class="form-check-input" [(ngModel)]="isCheckedL" type="checkbox" id="lunesM" [disabled]="!cck_dias_edit?.habilitar">
+                                Lunes</label>
+                              <label style=" font-size: 12px; color: black;  " id="asignarRol" size="10"><input
+                                  class="form-check-input" [(ngModel)]="isCheckedM" type="checkbox" id="martesM" [disabled]="!cck_dias_edit?.habilitar">
+                                Martes</label>
+                              <label style=" font-size: 12px; color: black;  " id="asignarRol" size="10"><input
+                                  class="form-check-input" [(ngModel)]="isCheckedMI" type="checkbox" id="miercolesM" [disabled]="!cck_dias_edit?.habilitar">
+                                Miercoles</label>
+                              <label style=" font-size: 12px; color: black;  " id="asignarRol" size="10"><input
+                                  class="form-check-input" [(ngModel)]="isCheckedJ" type="checkbox" id="juevesM" [disabled]="!cck_dias_edit?.habilitar">
+                                Jueves</label>
+                              <label style=" font-size: 12px; color: black;  " id="asignarRol" size="10"><input
+                                  class="form-check-input" [(ngModel)]="isCheckedV" type="checkbox" id="viernesM" [disabled]="!cck_dias_edit?.habilitar">
+                                Viernes</label>
+                              <label style=" font-size: 12px; color: black;  " id="asignarRol" size="10"><input
+                                  class="form-check-input" [(ngModel)]="isCheckedS" type="checkbox" id="sabadoM" [disabled]="!cck_dias_edit?.habilitar">
+                                Sabado</label>
+                              <label style=" font-size: 12px; color: black;  " id="asignarRol" size="10"><input
+                                  class="form-check-input" [(ngModel)]="isCheckedDO" type="checkbox" id="domingoM" [disabled]="!cck_dias_edit?.habilitar">
+                                Domingo</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-4" style="width: 50%;" *ngIf="tipoFrecuenciaSeleccionado=='Semanal'">
+                          <div class="input-group mb-3">
+                            <label class="input-text"
+                              style="  padding-top:8px;  font-size: 15px;color: black;width: 55%; background-color: rgba(255, 255, 255, 0);">Días</label>
+                            <div style="width: 40%;">
+                              <label style=" font-size: 12px; color: black;" id="asignarRol" size="10">
+                                  <input value="Lunes" (change)="onCheckboxChange('checkbox1')" [(ngModel)]="selectedDay" class="form-check-input" type="radio" id="lunesM" [disabled]="!cck_dias_edit?.habilitar"> Lunes
+                              </label>
+                              <label style=" font-size: 12px; color: black;" id="asignarRol" size="10">
+                                <input value="Martes" (change)="onCheckboxChange('checkbox2')" [(ngModel)]="selectedDay" class="form-check-input" type="radio" id="martesM" [disabled]="!cck_dias_edit?.habilitar"> Martes
+                              </label>
+                              <label style=" font-size: 12px; color: black;" id="asignarRol" size="10">
+                                <input value="Miercoles" (change)="onCheckboxChange('checkbox3')" [(ngModel)]="selectedDay" class="form-check-input" type="radio" id="miercolesM" [disabled]="!cck_dias_edit?.habilitar"> Miercoles
+                              </label>
+                              <label style=" font-size: 12px; color: black;" id="asignarRol" size="10">
+                                <input value="Jueves" (change)="onCheckboxChange('checkbox4')" [(ngModel)]="selectedDay" class="form-check-input" type="radio" id="juevesM" [disabled]="!cck_dias_edit?.habilitar"> Jueves
+                              </label>
+                              <label style=" font-size: 12px; color: black;" id="asignarRol" size="10">
+                                <input value="Viernes" (change)="onCheckboxChange('checkbox5')" [(ngModel)]="selectedDay" class="form-check-input" type="radio" id="viernesM" [disabled]="!cck_dias_edit?.habilitar"> Viernes
+                              </label>
+                              <label style=" font-size: 12px; color: black;" id="asignarRol" size="10">
+                                <input value="Sabado" (change)="onCheckboxChange('checkbox6')" [(ngModel)]="selectedDay" class="form-check-input" type="radio" id="sabadoM" [disabled]="!cck_dias_edit?.habilitar"> Sabado
+                              </label>
+                              <label style=" font-size: 12px; color: black;" id="asignarRol" size="10">
+                                <input value="Domingo" (change)="onCheckboxChange('checkbox7')" [(ngModel)]="selectedDay" class="form-check-input" type="radio" id="domingoM" [disabled]="!cck_dias_edit?.habilitar"> Domingo
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-4" style="width: 80%;" *ngIf="tipoFrecuenciaSeleccionado=='Mensual' && txt_dia_edit?.visualizar">
+                          <div class="input-group mb-3">
+                            <label class="input-text"
+                              style="  padding-top:15px;  font-size: 15px;color: black;width: 38%; background-color: rgba(255, 255, 255, 0);">Día
+                              único</label>
+                            <div style="width: 14%; padding-top:0px; ">
+                              <input maxlength="2" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                style=" border-radius: 5px; border-color: rgb(192, 186, 184);" class="form-control"
+                                [value]="diasmes" type="text" id="diaUnicoM"  [disabled]="!txt_dia_edit?.habilitar || !txt_dia_edit?.modificar">
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row" style="padding-top: 0px; ">
+                      <div class="col-md-4" style="width: 50%;" *ngIf="cck_aplica_feriado_edit?.visualizar">
+                        <div class="input-group mb-3">
+                          <label class="input-text" for="feriado"
+                            style="   font-size: 15px;color: black;margin-left: 20px; background-color: rgba(255, 255, 255, 0);">Aplicar
+                            en feriado</label>
+                          <div class="form-check form-switch" style="width: 30%; padding-top: 1px; ">
+                            <input style=" font-size: 12px; color: black;  " id="aplicaFeriadoM" size="10"
+                              class="form-check-input" [(ngModel)]="isChecked" type="checkbox" [disabled]="!cck_aplica_feriado_edit?.habilitar">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-4" style="width: 50%;" *ngIf="cck_estado_edit?.visualizar">
+                      <div class="input-group mb-3">
+                        <label class="input-text" for="estadoM"
+                          style="   font-size: 15px;color: black;margin-left: 20px; background-color: rgba(255, 255, 255, 0);">Estado</label>
+                        <div class="form-check form-switch" style="width: 30%; padding-top: 1px; ">
+                          <input style=" font-size: 12px; color: black;  " id="estadoM" [(ngModel)]="isCheckedes"
+                            size="10" class="form-check-input" type="checkbox" [disabled]="!cck_estado_edit?.habilitar">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="d-flex flex-row align-items-center"
+                      style="overflow: auto;padding-left: 20px;padding-right: 10px;">
+                      <div class="col-md-4" style="width: 50%;" *ngIf="txt_hora_edit?.visualizar">
+                        <div class="input-group mb-3">
+                          <label class="input-text"
+                            style=" margin-top: 12px;  padding-top: 10px;  font-size: 15px;color: black; width: 31%; background-color: rgba(255, 255, 255, 0);">Hora</label>
+                          <div style="width: 50%; padding-top:0px;margin-top: 12px; ">
+                            <input disabled style="  border-radius: 5px; border-color: rgb(192, 186, 184);"
+                              [(ngModel)]="valorCampoTexto" [placeholder]="hora" class="form-control" type="text"
+                              id="horaM" >
+                          </div>
+                          <button type="button" (click)="limpiarCampos()" class="btn btn-amarillo btn-icon-end"
+                            style="margin-left: 7px;font-size: 16px;margin-top: 12px">
+                            <i class="fas fa-trash-alt"></i>
+                          </button>
+                        </div>
+                      </div>
+                      <ngb-timepicker style="padding-left: 20px;padding-right: 5px; margin-left: -60px;"
+                        [(ngModel)]="horaSeleccionada" *ngIf="tpk_hora_edit?.visualizar" [disabled]="!tpk_hora_edit?.habilitar"></ngb-timepicker>
+                      <button style="padding: top 2px;" type="button" (click)="onAgregarHora()" *ngIf="btn_incluir_edit?.visualizar"[disabled]="!btn_incluir_edit?.habilitar"
+                        class="btn-sm btn btn-amarillo "><i class="fas fa-plus"></i></button>   
+                    </div>
+                  </h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+        <!--End Modal Modificar Proceso-->
+      </div>
+      <div class="d-flex justify-content-between align-items-center p-2">
+        <div class="d-flex align-items-center me-2" style="padding-left: 20px;">
+          <label for="pageSizeSelect" class="me-2">Vista:</label>
+          <div>
+            <select class="form-select" style="width: auto" id="pageSizeSelect" [(ngModel)]="cpageSize">
+              <option [ngValue]="4">4</option>
+              <option [ngValue]="10">10</option>
+              <option [ngValue]="15">15</option>
+              <option [ngValue]="25">25</option>
+            </select>
+          </div>
+        </div>
+        <div class="d-flex justify-content-between">
+          <ngb-pagination [(page)]="cpage" [maxSize]="10" [pageSize]="cpageSize" [collectionSize]="totalLengthOfCollection"
+            style="padding-right: 20px;"></ngb-pagination>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

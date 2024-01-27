@@ -1,0 +1,42 @@
+<div class="input-group">
+  <div class="input-group-prepend">
+    <span class="input-group-text">{{ label }}</span>
+  </div>
+  <input
+    #textInput
+    type="text"
+    [(ngModel)]="inputValue"
+    class="form-control select-input"
+    [placeholder]="placeholder"
+    (click)="showOptions()"
+    (keyup)="onChangeInputText($event)"
+    (blur)="onBlurInputText()"
+    (keyup.enter)="onEnterKey($event)"
+    (keyup.escape)="onEscapeKey()"
+  />
+  <div class="input-group-append" *ngIf="showClear">
+    <button
+      class="btn btn-outline-secondary button-clear"
+      type="button"
+      (click)="clearSelect()"
+    >
+      X
+    </button>
+  </div>
+  <div class="select-options" *ngIf="showOptionsContainer">
+    <ng-container *ngIf="selectOptions.length > 0; else optionsEmpty">
+      <div
+        class="select-option"
+        *ngFor="let option of selectOptions"
+        [class]="{ 'select-option-selected': option.value === selectValue }"
+        [value]="option.value"
+        (click)="onSelectOption(option)"
+      >
+        {{ option.label }}
+      </div>
+    </ng-container>
+    <ng-template class="container-empty-options" #optionsEmpty>
+      <div class="text-empty-option">Sin Opciones</div>
+    </ng-template>
+  </div>
+</div>

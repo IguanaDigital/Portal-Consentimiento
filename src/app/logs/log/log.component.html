@@ -1,0 +1,169 @@
+<div class="row">
+  <div class="col-md-12"> 
+    <div class="card">
+      <div>
+        <h2 class="text-start p-3">
+          <div class="row">
+            <div class="col-md-4">
+              <b style="color: firebrick;font-size: xx-large;">Logs</b>
+            </div>
+
+            <div class="col-md-8 text-end">
+              <input class="form-check-input"  type="checkbox" id="historico" [(ngModel)]="isChecked" ><i></i> Histórico
+
+              <button *ngIf="permisos?.exportar" (click)="exportToExcelLogs()" type="button"  class="mr-10 fz-14 btn btn-export">
+                <i class="fas fa-file-excel"></i> Exportar
+              </button>          
+                         
+              <button [disabled]="isSearchDisabled"  (click)="onConsultarLogs()" type="button" class="mr-10 fz-14 btn btn-danger btn-icon-end" >
+                <i class="fas fa-filter"></i> Buscar
+                </button>
+                <!--  [disabled]="isSearchDisabled"-->
+            </div>
+          </div>
+          <p>  </p>
+          <div class="row row-fil"   >
+            <div class="col-md-3">
+              <div class="input-group mb-3">
+                <label class="input-group-text fz-10" for="filtroSelect" style="color: crimson;">Origen</label>
+                <select (change)="onTipoMenu($event)" style="text-align: center" id="Origen" class="form-select fz-10">
+                  <option value=-1 >Selecccione</option>
+                  <option value='0' >Otros</option>
+                  <option  *ngFor="let menu of dataMenu" [value]="menu.id" > {{ menu.nombre}}</option>  
+                </select>
+              </div>
+            </div>
+    
+            <div class="col-md-3" >
+              <div class="input-group mb-3">
+                <label class="input-group-text fz-10" for="filtroSelect" style="color: crimson;">Tipo evento</label>
+                <select  (change)="onTipoEvento($event)"   style="text-align: center" id="tipoEvento" class="form-select fz-10">
+                  <option value=null hidden>Selecccione</option>
+                  <option value ="Todos" >Todos</option>
+                  <option value ="Exito" >Exito</option>
+                  <option value ="Error" >Error</option>
+                  <option value ="Informe">Informe</option>
+                </select>
+              </div>
+            </div>
+    
+            <div class="col-md-3">
+              <div class="input-group mb-3">
+                <app-date-picker label="Fecha desde:" (change)="onFechaDesdeChange($event)"
+                  [value]="filtroDto.fechaInicio"></app-date-picker>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="input-group mb-3">
+                <app-date-picker label="Fecha hasta:" (change)="onFechaHastaChange($event)"
+                  [value]="filtroDto.fechaFin"></app-date-picker>
+              </div>
+            </div> 
+           
+          </div>
+        </h2>
+      </div>
+         
+      <app-loading-overlay *ngIf="isLoading"></app-loading-overlay>
+      <!--Table Logs -->
+      <div class="d-flex flex-row align-items-center" style="overflow: auto;padding-left: 10px;padding-right: 10px;">
+        <table  aria-label class="table table-striped border mt-4" id="table-consulta">
+          <thead>
+            <tr style="font-size: 12.5px;color: crimson;font-weight: 600;">
+              
+              <th id="Origen" style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">Origen</th>
+              <th id="Servicio" style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">Servicio</th>
+              <th id="COT" style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">COT</th>
+              <th id="TipoEvento" style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">Tipo de evento</th>
+              <th id="Codigo" style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">Código</th>
+              <th id="Descripcion" style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">Descripción</th>
+              <th id="Usuario" style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">Usuario</th>
+              <th id="Fecha" style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">Fecha</th>
+              
+            </tr>
+
+            <tr class="table-row">
+              <th id="Origen1"><input id="Código" type="text" class="table-filter" placeholder="Origen"
+                value="{{columnSearchTerm.origen}}" (keyup)='onSearch($event,"origen")' /></th>
+
+              <th id="Servicio1"><input id="cuentaBce" type="text" class="table-filter" placeholder="Servicio"
+                value="{{columnSearchTerm.servicio}}" (keyup)='onSearch($event,"servicio")' /></th>    
+
+              <th id="COT1"><input id="cuentaBce" type="text" class="table-filter" placeholder="COT"
+                value="{{columnSearchTerm.tipoLogs}}" (keyup)='onSearch($event,"tipoLogs")' /></th>   
+
+
+              <th id="TipoEvento1"><input id="Código" type="text" class="table-filter" placeholder="Tipo de evento"
+                value="{{columnSearchTerm.tipoDeEvento}}" (keyup)='onSearch($event,"tipoDeEvento")' /></th>
+
+              <th id="Codigo1"><input id="cuentaBce" type="text" class="table-filter" placeholder="Código"
+                value="{{columnSearchTerm.codigo}}" (keyup)='onSearch($event,"codigo")' /></th>    
+
+              <th id="Descripcion1"><input style="width: 100%;" id="cuentaBce" type="text" class="table-filter" placeholder="Descripción"
+                value="{{columnSearchTerm.descripcion}}" (keyup)='onSearch($event,"descripcion")' /></th>    
+                          
+              <th id="Usuario1"><input id="nombre" type="text" class="table-filter" placeholder="Usuario"
+                value="{{columnSearchTerm.usuario}}" (keyup)='onSearch($event,"usuario")' /></th>
+
+              <th id="Fecha1"><input type="text" class="table-filter" placeholder="mm/dd/yyyy" appDateInput
+                (keydown.enter)="onDateChange($event, 'fechaCreacion')" /></th>
+
+           
+             
+            </tr>
+          </thead>
+                   
+          <tbody>
+            <tr style="text-align: center; font-size: 12.5px;vertical-align: middle;"
+            *ngFor="let Logs of filteredCuentas| slice: (cpage-1) * cpageSize : (cpage-1) * cpageSize + cpageSize">
+            <td class="reduce-width">
+              <ngb-highlight [result]="Logs.origen" [term]="columnSearchTerm.origen"></ngb-highlight>
+            </td>
+            <td class="reduce-width">
+              <ngb-highlight [result]="Logs.servicio" [term]="columnSearchTerm.servicio"></ngb-highlight>
+            </td>
+            <td class="reduce-width">
+              <ngb-highlight [result]="Logs.tipoLogs" [term]="columnSearchTerm.tipoLogs"></ngb-highlight>
+            </td>
+            <td class="reduce-width">
+              <ngb-highlight [result]="Logs.tipoDeEvento" [term]="columnSearchTerm.tipoDeEvento"></ngb-highlight>
+            </td>
+            <td class="reduce-width">
+              <ngb-highlight [result]="Logs.codigo" [term]="columnSearchTerm.codigo"></ngb-highlight>
+            </td>
+            <td class="reduce-width">
+              <ngb-highlight [result]="Logs.descripcion" [term]="columnSearchTerm.descripcion"></ngb-highlight>
+            </td>
+            <td class="reduce-width">
+              <ngb-highlight [result]="Logs.usuario" [term]="columnSearchTerm.usuario"></ngb-highlight>
+            </td>
+            <td class="reduce-width">
+              <ngb-highlight [result]='formatDate(Logs.fechaCreacion, "MM/dd/yyyy HH:mm")'
+                [term]="columnSearchTerm.fechaCreacion"></ngb-highlight>
+            </td>
+           
+            </tr>          
+          </tbody>
+        </table>
+      </div>
+      <!--End Table Logs-->
+
+      <div class="d-flex justify-content-between align-items-center p-2">
+        <div class="d-flex align-items-center me-2" style="padding-left: 20px;">
+          <label for="pageSizeSelect" class="me-2">Vista:</label>
+          <div>
+            <select class="form-select" style="width: auto" id="pageSizeSelect" [(ngModel)]="cpageSize">
+              <option [ngValue]="4">4</option>
+              <option [ngValue]="10">10</option>
+              <option [ngValue]="15">15</option>
+              <option [ngValue]="25">25</option>
+            </select>
+          </div>
+        </div>   
+        <div class="d-flex justify-content-center">
+          <ngb-pagination [(page)]="cpage" [maxSize]="10" [pageSize]="cpageSize" [collectionSize]="filteredCuentas.length" style="padding-right: 20px;"></ngb-pagination>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

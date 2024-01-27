@@ -1,0 +1,422 @@
+<div class="row">
+  <div class="col-md-12"> 
+    <div class="card">
+      <div>
+        <h2 class="text-start p-3">
+          <div class="row">
+            <div class="col-md-4">
+              <b style="color: firebrick;font-size: xx-large;">Enmascaramiento</b>
+            </div>
+            
+            <div class="col-md-8 text-end">
+              <button *ngIf="permisos?.exportar" (click)="exportToExcelEnmascaramiento()"  type="button"  class="mr-10 fz-14 btn btn-export">
+                <i class="fas fa-file-excel"></i> Exportar
+              </button>
+              <button   *ngIf="permisos?.nuevo" (click)="mostrarModalCrearEnmascaramiento()"   type="button"   class="mr-10 fz-14 btn btn-danger btn-icon-end">
+                <i class="fas fa-plus"></i> Agregar
+              </button>
+            </div>
+            
+          </div>
+        </h2>
+      </div>
+      <!--Table Enmascaramiento -->
+      <app-loading-overlay *ngIf="isLoading"></app-loading-overlay>
+      <table  aria-label class="table table-striped border mt-4" id="table-consulta">
+        <thead>
+          <tr style="font-size: 12.5px;color: crimson;font-weight: 600;">
+            <th style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">Nombre</th>
+            <th style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">Longitud</th>
+            <th style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">Formato</th>
+            <th style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">Fecha Modificación</th>
+            <th style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">Estado</th>
+            <th *ngIf="permisos?.modificar || permisos?.eliminar" style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">Acciones</th>
+          
+          </tr>
+        </thead>
+        
+        <tbody>
+          <tr style="text-align: center; font-size: 12.5px;vertical-align: middle;" 
+            *ngFor="let enmascaramiento of dataEnmascaramiento.slice((cpage-1) * cpageSize, cpage * cpageSize)">
+              <td>{{ enmascaramiento.nombre }}</td>
+              <td>{{ enmascaramiento.longitud }}</td>
+              <td>{{ enmascaramiento.formato }}</td>
+              <td>{{ enmascaramiento.fechaModificacion.substring(0,16) | date:'MM/dd/yyyy HH:mm '  }}</td>
+             
+
+              <td *ngIf="enmascaramiento.estado=='A'">     
+                <div  class="form-switch"  >
+                  <input   id="estadoC"  style=" font-size: 12px; color: crimson;"   
+                   size="10" class="form-check-input" type="checkbox" [(ngModel)]="isCheckedEstado1"disabled > 
+               </div>
+              </td>
+              <td *ngIf="enmascaramiento.estado=='I'">     
+                <div  class="form-switch"  >
+                  <input   id="estadoC"  style=" font-size: 12px; color: crimson;"   
+                   size="10" class="form-check-input" type="checkbox" [(ngModel)]="isCheckedEstado2" disabled>  
+               </div>
+              </td>
+            <td *ngIf="permisos?.modificar || permisos?.eliminar">
+              <button *ngIf="permisos?.modificar" (click)="mostrarModalUpdateEnmascaramiento(enmascaramiento.id,
+              enmascaramiento.nombre,enmascaramiento.longitud,enmascaramiento.formato,enmascaramiento.tipoDeDato,enmascaramiento.estado)"
+                type="button" class="btn btn-icon-end" >
+                <i class="fas fa-edit" style="color: rgb(220, 20, 60);"></i>
+              </button>
+              <button *ngIf="permisos?.eliminar" (click)="onDeleteEnmascaramiento(enmascaramiento.id)"
+                type="button" class="btn btn-icon-end" >
+                <i class="fas fa-trash-alt" style="color: rgb(220, 20, 60);" ></i>
+              </button>
+            </td>    
+          </tr>          
+        </tbody>
+      </table>
+      <!--End Table Enmascaramiento -->
+
+      <!--Modal Crear enmascaramiento-->
+      <ng-template #myModalCrearEnmascaramiento let-modal >
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card">
+              <div>
+                <h2 class="card-body text-start">
+                  <div class="row">
+                    <div class="col-md-7">
+                      <b style="color: firebrick;font-size: xx-large;margin: 20px;">Crear enmascaramiento</b>
+                    </div>
+
+                    <div class="col-md-5 text-end">
+                      <button style="margin: 0px 10px; background-color: rgb(255, 255, 255 ) !important;
+                      color: rgb(220, 20, 60);" type="button"
+                       (click)="modal.dismiss(tipoFrecuenciaSeleccionado = null)"
+                        class="mr-10 fz-14 btn btn-danger btn-icon-end">Cancelar
+                      </button>
+
+                      <button  type="button" class="mr-10 fz-14 btn btn-danger btn-icon-end"
+                      (click)="onSaveEnmascaramiento()" aria-label="Close" aria-label="Close">
+                      <i class="fas fa-save"></i> Guardar
+                      </button>
+                    </div>
+                  </div>   
+                </h2>
+              </div>
+            </div> 
+          
+          </div>
+
+          <div class="d-flex flex-row align-items-top" style="padding-left: 20px;padding-right: 10px;">
+            <div class="col-md-5">
+              <div class="card">
+                <div>
+                 
+                  <h2 class="card-body text-start">
+                    <div class="d-flex flex-row align-items-center" style="overflow: auto;padding-left: 20px;padding-right: 10px;">
+                      <div class="col-md-5" style="width: 100%;">
+                        <div class="input-group mb-4" >
+                          <label class="input-text" for="nombre" 
+                          style="  padding-top:8px;  font-size: 15px;color: crimson;width: 31%; background-color: rgba(255, 255, 255, 0);">Nombre</label>
+                          <div style="width: 60%; padding-top:0px; ">
+                          <input maxlength="100" style="  border-radius: 5px; border-color: rgb(192, 186, 184);"  class="form-control" type="text" id="nombre">
+                        </div>
+                        </div>
+                      </div>
+                    
+                    </div>   
+                    
+                    <div class="d-flex flex-row align-items-center" style="overflow: auto;padding-left: 20px;padding-right: 10px;">
+                      <div class="col-md-5" style="width: 100%;">
+                        <div class="input-group mb-4" >
+                          <label class="input-text" for="longitud" 
+                          style="  padding-top:8px;  font-size: 15px;color: crimson;width: 31%; background-color: rgba(255, 255, 255, 0);">Longitud</label>
+                          <div style="width: 60%; padding-top:0px; ">
+                          <input maxlength="4" style="  border-radius: 5px; border-color: rgb(192, 186, 184);"  oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="form-control" type="text" id="longitud">
+                        </div>
+                        </div>
+                      </div>
+                    
+                    </div>   
+                    <div  class="col-md-5" style="width: 100%;padding-left: 20px;" >
+                      <div class="input-group mb-4" >
+                        <label class="input-text" for="estado"
+                        style="   font-size: 15px;color: crimson; background-color: rgba(255, 255, 255, 0);">Estado</label>
+                        <div class="form-check form-switch" style="width: 50%;padding-left: 100px; ">
+                          <input  style=" font-size: 12px; color: crimson;  " id="estado"  checked  size="10"class="form-check-input" type="checkbox" >
+                        </div>
+                      </div>
+                    </div>
+                    <div  class="col-md-5" style="width: 100%;padding-left: 20px;" >
+                      <div class="input-group mb-4" >
+                        <label class="input-text"  
+                        style="  padding-top:8px;  font-size: 15px;color: crimson;width: 32%; background-color: rgba(255, 255, 255, 0);">Tipo de dato</label>
+                        
+                        <div style="width: 55%; padding-top:0px; " >
+                          <select style=" border-radius: 5px; border-color: rgb(192, 186, 184); text-align: left;" id="tipoDeDato" (change)="onTipoDato($event)" class="form-select fz-14">
+                            <option  value=""  hidden>Selecccione</option>
+                            <option  value="Alfanumérico">Alfanumérico</option>
+                            <option  value="Numérico">Numérico</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div> 
+          
+                    <div class="d-flex flex-row align-items-center" style="overflow: auto;padding-left: 20px;padding-right: 10px;">
+                      <div class="col-md-5" style="width: 100%;">
+                        <div class="input-group mb-4" >
+                          <label class="input-text" for="formato" 
+                          style="  padding-top:8px;  font-size: 15px;color: crimson;width: 31%; background-color: rgba(255, 255, 255, 0);">Formato</label>
+                          <div style="width: 60%; padding-top:0px; ">
+                          <input style="  border-radius: 5px; border-color: rgb(192, 186, 184);" oninput="this.value = this.value.replace(/[^x-]/g, '')" class="form-control" type="text" id="formato">
+                        </div>
+                        </div>
+                      </div>
+                    </div>   
+                  </h2>
+
+                </div>
+              </div> 
+            
+            </div>        
+            
+            <div  *ngIf="onTipoDatoSeleccionado=='Numérico'"  class="col-md-4" style="width: 50%;" >
+              <div class="card">
+                <div>
+                  <div class="card-body bg-light" >
+                    
+                    <a style="font-size: 14px;">Para el contenido visible, ingrese el formato  </a>
+                    <u style="font-size: 14px;color: crimson;width: 31%; background-color: rgba(255, 255, 255, 0);">Dato</u>
+                    <a style="font-size: 14px;"> y para ocultar el formato  </a>
+                   
+                    <u style="font-size: 14px;color: crimson;width: 31%; background-color: rgba(255, 255, 255, 0);">Enmascarado</u>.
+                    <p>  </p>
+                    <a style="font-size: 12px;width: 31%; background-color: rgba(255, 255, 255, 0);">Caracteres a utilizar.</a>
+                    <p>  </p>
+                    <label style="text-align:center; margin: 0px 30px; font-size: 14px; color: rgb(179, 172, 172)">Dato
+                      <p style="color: rgb(13, 11, 12);"> <a style="line-height: 1em; font-size: 40px;width: 31%;color: rgb(211, 22, 60); background-color: rgba(255, 255, 255, 0);">-</a></p>
+                    </label>
+        
+                    <label style="text-align:center; margin: 0px 30px; font-size: 14px; color: rgb(179, 172, 172)">Enmascarado 
+                      <p style="color: rgb(13, 11, 12);"> <a style="line-height: 1em; font-size: 40px;width: 31%;color: rgb(211, 22, 60); background-color: rgba(255, 255, 255, 0);">x</a></p>
+                    </label>
+                    <p>  </p>
+                    <a style="background-color:white;"><a style="color: rgb(247, 238, 238);" style="line-height: 1em; font-size: 14px;color: crimson;width: 31%; background-color: rgba(221, 234, 223, 0);">Ejemplo <a style="line-height: 1em; font-size: 16px;color: rgb(25, 24, 24);width: 31%; "> xx----xx----x</a> </a></a>
+                    
+                    
+
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div  *ngIf="onTipoDatoSeleccionado=='Alfanumérico'"  class="col-md-4" style="width: 50%;" >
+              <div class="card">
+                <div>
+                  <div class="card-body bg-light" >
+                    <a style="font-size: 14px;">Para el contenido visible, ingrese el formato  </a>
+                    <u style="font-size: 14px;color: crimson;width: 31%; background-color: rgba(255, 255, 255, 0);">Dato</u>
+                    <a style="font-size: 14px;"> y para ocultar el formato  </a>
+                   
+                    <u style="font-size: 14px;color: crimson;width: 31%; background-color: rgba(255, 255, 255, 0);">Enmascarado</u>.
+                    <p>  </p>
+                    <a style="font-size: 12px;width: 31%; background-color: rgba(255, 255, 255, 0);">Caracteres a utilizar.</a>
+                    <p>  </p>
+                    <label style="text-align:center; margin: 0px 30px; font-size: 14px; color: rgb(179, 172, 172)">Dato
+                      <p style="color: rgb(13, 11, 12);"> <a style="line-height: 1em; font-size: 40px;width: 31%;color: rgb(211, 22, 60); background-color: rgba(255, 255, 255, 0);">-</a></p>
+                    </label>
+        
+                    <label style="text-align:center; margin: 0px 30px; font-size: 14px; color: rgb(179, 172, 172)">Enmascarado 
+                      <p style="color: rgb(13, 11, 12);"> <a style="line-height: 1em; font-size: 40px;width: 31%;color: rgb(211, 22, 60); background-color: rgba(255, 255, 255, 0);">x</a></p>
+                    </label>
+              
+                    <p>  </p>
+                    <a style="background-color:white;"><a style="color: rgb(247, 238, 238);" style="line-height: 1em; font-size: 14px;color: crimson;width: 31%; background-color: rgba(221, 234, 223, 0);">Ejemplo <a style="line-height: 1em; font-size: 16px;color: rgb(25, 24, 24);width: 31%; "> xx----xx----x</a> </a></a>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>  
+        </div>
+      </ng-template>
+      <!--End Modal Crear enmascaramiento-->
+
+      <!--Modal Update enmascaramiento-->
+      <ng-template #myModalUpdateEnmascaramiento let-modal >
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card">
+              <div>
+                <h2 class="card-body text-start">
+                  <div class="row">
+                    <div class="col-md-8">
+                      <b style="color: firebrick;font-size: xx-large;margin: 20px;">Modificar enmascaramiento</b>
+                    </div>
+
+                    <div class="col-md-4 text-end">
+                      <button style="margin: 0px 10px; background-color: rgb(255, 255, 255 ) !important;
+                      color: rgb(220, 20, 60);" type="button"
+                       (click)="modal.dismiss(tipoFrecuenciaSeleccionado = null)"
+                        class="mr-10 fz-14 btn btn-danger btn-icon-end">Cancelar
+                      </button>
+
+                      <button  type="button" class="mr-10 fz-14 btn btn-danger btn-icon-end"
+                      (click)="onEditarEnmascaramiento(id)" aria-label="Close" aria-label="Close">
+                      <i class="fas fa-save"></i> Guardar
+                      </button>
+                    </div>
+                  </div>   
+                </h2>
+              </div>
+            </div> 
+          
+          </div>
+
+          <div class="d-flex flex-row align-items-top" style="padding-left: 20px;padding-right: 10px;">
+            <div class="col-md-5">
+              <div class="card">
+                <div>
+                 
+                  <h2 class="card-body text-start">
+                    <div class="d-flex flex-row align-items-center" style="overflow: auto;padding-left: 20px;padding-right: 10px;">
+                      <div class="col-md-5" style="width: 100%;">
+                        <div class="input-group mb-4" >
+                          <label class="input-text" for="nombreM" 
+                          style="  padding-top:8px;  font-size: 15px;color: crimson;width: 31%; background-color: rgba(255, 255, 255, 0);">Nombre</label>
+                          <div style="width: 60%; padding-top:0px; ">
+                          <input  maxlength="100" style="  border-radius: 5px; border-color: rgb(192, 186, 184);" [value]="nombre"  class="form-control" type="text" id="nombreM">
+                        </div>
+                        </div>
+                      </div>
+                    
+                    </div>   
+                    
+                    <div class="d-flex flex-row align-items-center" style="overflow: auto;padding-left: 20px;padding-right: 10px;">
+                      <div class="col-md-5" style="width: 100%;">
+                        <div class="input-group mb-4" >
+                          <label class="input-text" for="longitudM" 
+                          style="  padding-top:8px;  font-size: 15px;color: crimson;width: 31%; background-color: rgba(255, 255, 255, 0);">Longitud</label>
+                          <div style="width: 60%; padding-top:0px; ">
+                          <input  maxlength="4" style="  border-radius: 5px; border-color: rgb(192, 186, 184);" [value]="longitud" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="form-control" type="text" id="longitudM">
+                        </div>
+                        </div>
+                      </div>
+                    
+                    </div>   
+                    <div  class="col-md-5" style="width: 100%;padding-left: 20px;" >
+                      <div class="input-group mb-4" >
+                        <label class="input-text" for="estadoM"
+                        style="   font-size: 15px;color: crimson; background-color: rgba(255, 255, 255, 0);">Estado</label>
+                        <div class="form-check form-switch" style="width: 50%;padding-left: 100px; ">
+                          <input  style=" font-size: 12px; color: crimson;  " id="estadoM"  [(ngModel)]="isChecked"  size="10"class="form-check-input" type="checkbox" >
+                        </div>
+                      </div>
+                    </div>
+                    <div  class="col-md-5" style="width: 100%;padding-left: 20px;" >
+                      <div class="input-group mb-4" >
+                        <label class="input-text"  
+                        style="  padding-top:8px;  font-size: 15px;color: crimson;width: 32%; background-color: rgba(255, 255, 255, 0);">Tipo de dato</label>
+                        
+                        <div style="width: 55%; padding-top:0px; " >
+                          <select [(ngModel)]="onTipoDatoSeleccionado" style=" border-radius: 5px; border-color: rgb(192, 186, 184); text-align: left;" id="tipoDeDatoM" (change)="onTipoDato($event)" class="form-select fz-14">
+                            <option  value=""  hidden>Selecccione</option>
+                            <option  value="Alfanumérico">Alfanumérico</option>
+                            <option  value="Numérico">Numérico</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div> 
+          
+                    <div class="d-flex flex-row align-items-center" style="overflow: auto;padding-left: 20px;padding-right: 10px;">
+                      <div class="col-md-5" style="width: 100%;">
+                        <div class="input-group mb-4" >
+                          <label class="input-text" for="formatoM" 
+                          style="  padding-top:8px;  font-size: 15px;color: crimson;width: 31%; background-color: rgba(255, 255, 255, 0);">Formato</label>
+                          <div style="width: 60%; padding-top:0px; ">
+                          <input style="  border-radius: 5px; border-color: rgb(192, 186, 184);" [value]="formato" oninput="this.value = this.value.replace(/[^x-]/g, '')" class="form-control" type="text" id="formatoM">
+                        </div>
+                        </div>
+                      </div>
+                    </div>   
+                  </h2>
+
+                </div>
+              </div> 
+            
+            </div>        
+            
+            <div  *ngIf="onTipoDatoSeleccionado=='Numérico'"  class="col-md-4" style="width: 50%;" >
+              <div class="card">
+                <div>
+                  <div class="card-body bg-light" >
+                    
+                    <a style="font-size: 14px;">Para el contenido visible, ingrese el formato  </a>
+                    <u style="font-size: 14px;color: crimson;width: 31%; background-color: rgba(255, 255, 255, 0);">Dato</u>
+                    <a style="font-size: 14px;"> y para ocultar el formato  </a>
+                   
+                    <u style="font-size: 14px;color: crimson;width: 31%; background-color: rgba(255, 255, 255, 0);">Enmascarado</u>.
+                    <p>  </p>
+                    <a style="font-size: 12px;width: 31%; background-color: rgba(255, 255, 255, 0);">Caracteres a utilizar.</a>
+                    <p>  </p>
+                    <label style="text-align:center; margin: 0px 30px; font-size: 14px; color: rgb(179, 172, 172)">Dato
+                      <p style="color: rgb(13, 11, 12);"> <a style="line-height: 1em; font-size: 40px;width: 31%;color: rgb(211, 22, 60); background-color: rgba(255, 255, 255, 0);">-</a></p>
+                    </label>
+        
+                    <label style="text-align:center; margin: 0px 30px; font-size: 14px; color: rgb(179, 172, 172)">Enmascarado 
+                      <p style="color: rgb(13, 11, 12);"> <a style="line-height: 1em; font-size: 40px;width: 31%;color: rgb(211, 22, 60); background-color: rgba(255, 255, 255, 0);">x</a></p>
+                    </label>
+              
+                    <p>  </p>
+                    <a style="background-color:white;"><a style="color: rgb(247, 238, 238);" style="line-height: 1em; font-size: 14px;color: crimson;width: 31%; background-color: rgba(221, 234, 223, 0);">Ejemplo <a style="line-height: 1em; font-size: 16px;color: rgb(25, 24, 24);width: 31%; "> xx----xx----x</a> </a></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+             <div  *ngIf="onTipoDatoSeleccionado=='Alfanumérico'"  class="col-md-4" style="width: 50%;" >
+              <div class="card">
+                <div>
+                  <div class="card-body bg-light" >
+                    <a style="font-size: 14px;">Para el contenido visible, ingrese el formato  </a>
+                    <u style="font-size: 14px;color: crimson;width: 31%; background-color: rgba(255, 255, 255, 0);">Dato</u>
+                    <a style="font-size: 14px;"> y para ocultar el formato  </a>
+                   
+                    <u style="font-size: 14px;color: crimson;width: 31%; background-color: rgba(255, 255, 255, 0);">Enmascarado</u>.
+                    <p>  </p>
+                    <a style="font-size: 12px;width: 31%; background-color: rgba(255, 255, 255, 0);">Caracteres a utilizar.</a>
+                    <p>  </p>
+                    <label style="text-align:center; margin: 0px 30px; font-size: 14px; color: rgb(179, 172, 172)">Dato
+                      <p style="color: rgb(13, 11, 12);"> <a style="line-height: 1em; font-size: 40px;width: 31%;color: rgb(211, 22, 60); background-color: rgba(255, 255, 255, 0);">-</a></p>
+                    </label>
+        
+                    <label style="text-align:center; margin: 0px 30px; font-size: 14px; color: rgb(179, 172, 172)">Enmascarado 
+                      <p style="color: rgb(13, 11, 12);"> <a style="line-height: 1em; font-size: 40px;width: 31%;color: rgb(211, 22, 60); background-color: rgba(255, 255, 255, 0);">x</a></p>
+                    </label>
+              
+                    <p>  </p>
+                    <a style="background-color:white;"><a style="color: rgb(247, 238, 238);" style="line-height: 1em; font-size: 14px;color: crimson;width: 31%; background-color: rgba(221, 234, 223, 0);">Ejemplo <a style="line-height: 1em; font-size: 16px;color: rgb(25, 24, 24);width: 31%; "> xx----xx----x</a> </a></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div> 
+        </div>
+      </ng-template>
+      <!--End Modal Update enmascaramiento-->
+
+      <div class="d-flex justify-content-between align-items-center p-2">
+
+        <div class="d-flex align-items-center me-2" style="padding-left: 20px;">
+          <label for="pageSizeSelect" class="me-2">Vista:</label>
+          <div>
+            <select class="form-select" style="width: auto" id="pageSizeSelect" [(ngModel)]="cpageSize">
+              <option [ngValue]="4">4</option>
+              <option [ngValue]="10">10</option>
+              <option [ngValue]="15">15</option>
+              <option [ngValue]="25">25</option>
+            </select>
+          </div>
+        </div>   
+        <div class="d-flex justify-content-center">
+          <ngb-pagination [(page)]="cpage" [maxSize]="10" [pageSize]="cpageSize" [collectionSize]="totalLengthOfCollection" style="padding-right: 20px;"></ngb-pagination>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

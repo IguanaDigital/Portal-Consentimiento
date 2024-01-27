@@ -1,0 +1,531 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div>
+        <h2 class="card-body text-start">
+          <b style="color: black; font-size: xx-large">Plantillas</b>
+          <div class="text-end">
+            <button
+              type="button"
+              *ngIf="permisos?.exportar && btn_exportar?.visualizar"
+              (click)="exportToExcel()"
+              class="mr-10 fz-14 btn btn-export"
+              style="margin-right: 20px; width: 10%; font-size: 14px"
+              [disabled]="!btn_exportar?.habilitar"
+            >
+              <i class="fas fa-file-excel"></i> Exportar
+            </button>
+            <button
+              type="button"
+              class="btn btn-amarillo btn-icon-end"
+              *ngIf="permisos?.nuevo && btn_agregar?.visualizar"
+              (click)="openModal(content)"
+              style="margin-right: 10px; width: 10%; font-size: 14px"
+              [disabled]="!btn_agregar?.habilitar"
+            >
+              <i class="fas fa-plus fs-3 me-1"></i>Agregar
+            </button>
+          </div>
+        </h2>
+      </div>
+      <ng-template #content let-modal>
+        <div class="modal-header">
+          <h2 class="modal-title">
+            <b style="color: black; font-size: xx-large">Crear Plantilla</b>
+          </h2>
+          <button
+            type="button"
+            class="btn-close"
+            aria-label="Close"
+            (click)="modal.dismiss()"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <div class="row" style="margin-bottom: 20px">
+              <div class="col-md-8" style="width: 76%">
+                <div class="input-group mb-3">
+                  <label
+                    class="input-group-text"
+                    for="nombre"
+                    style="color: black; background-color: #f3f5f7; width: 18%"
+                    *ngIf="permisos?.modificar && txt_titulo?.visualizar"
+                    >Título</label
+                  >
+                  <input
+                    maxlength="300"
+                    class="form-control"
+                    type="text"
+                    formControlName="titulo"
+                    id="titulo"
+                    placeholder="Título"
+                    style="width: 65%"
+                    maxlength="300"
+                    *ngIf="permisos?.modificar && txt_titulo?.visualizar"
+                  />
+                </div>
+              </div>
+              <div class="col-md-4" style="width: 24%">
+                <div class="input-group mb-3">
+                  <label
+                    class="input-group-text"
+                    for="estado"
+                    style="color: black; background-color: #f3f5f7"
+                    >Estado</label
+                  >
+                  <div
+                    class="form-check form-switch"
+                    style="padding-left: 20px"
+                  >
+                    <input
+                      style="
+                        color: black;
+                        margin-left: 0px;
+                        width: 55px;
+                        margin-top: 8px;
+                      "
+                      id="estado"
+                      size="10"
+                      class="form-check-input"
+                      type="checkbox"
+                      [checked]="form.get('estado').value === 'A'"
+                      (change)="onEstadoChange($event)"
+                      *ngIf="cck_estado?.visualizar"
+                      [disabled]="
+                        !permisos?.modificar || !cck_estado?.habilitar
+                      "
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- <div class="row" style="margin-bottom: 20px;">
+              <div class="col-md-6">
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="destinatario" style="color: crimson;background: white;">Correo
+                    destinatario</label>
+                  <input type="text" formControlName="destinatario" class="form-control" id="destinatario"
+                    placeholder="destinatario">
+                </div>
+                <div style="text-align: center;"
+                  *ngIf="form.controls.destinatario.invalid && (form.controls.destinatario.dirty || form.controls.destinatario.touched)">
+                  <small class="text-danger" *ngIf="form.controls.destinatario.errors.required">El correo del
+                    destinatario es requerido.</small>
+                  <small class="text-danger" *ngIf="form.controls.destinatario.errors.invalidEmail">Por favor, introduce
+                    un correo electrónico válido.</small>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="copia"
+                    style="color: crimson;background: white;width: 21%;">CC</label>
+                  <input type="text" formControlName="copia" class="form-control" id="copia" placeholder="copia">
+                </div>
+                <div style="text-align: center;"
+                  *ngIf="form.controls.copia.invalid && (form.controls.copia.dirty || form.controls.copia.touched)">
+                  <small class="text-danger" *ngIf="form.controls.copia.errors.multiEmail">Por favor, introduce correos
+                    electrónicos válidos separados por coma (,).</small>
+                </div>
+              </div>
+            </div> -->
+            <div class="row" style="margin-bottom: 20px">
+              <div
+                class="col-md-6"
+                style="width: 100%"
+                *ngIf="txt_contenido_video?.visualizar"
+              >
+                <div class="input-group mb-3">
+                  <label
+                    class="input-group-text"
+                    for="asunto"
+                    style="color: black; background-color: #f3f5f7"
+                    >Contenido <br />
+                    Video</label
+                  >
+                  <input
+                    type="text"
+                    formControlName="contenido_video"
+                    class="form-control"
+                    id="contenido_video"
+                    placeholder="Contenido de Video"
+                    [disabled]="
+                      !txt_contenido_video?.habilitar ||
+                      !txt_contenido_video?.modificar
+                    "
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="row" style="margin-bottom: 20px">
+              <div class="col-md-12" *ngIf="txt_contenido?.visualizar">
+                <div class="input-group mb-3">
+                  <label
+                    class="input-group-text"
+                    for="contenido"
+                    style="color: black; background-color: #f3f5f7"
+                    >Contenido</label
+                  >
+                  <textarea
+                    type="text"
+                    formControlName="contenido"
+                    class="form-control"
+                    id="contenido"
+                    placeholder="contenido"
+                    [disabled]="
+                      !txt_contenido?.habilitar || !txt_contenido?.modificar
+                    "
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                (click)="modal.dismiss()"
+                *ngIf="btn_cancelar?.visualizar"
+                [disabled]="!btn_cancelar?.habilitar"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                class="btn btn-amarillo"
+                *ngIf="btn_guardar?.visualizar"
+                [disabled]="!form.valid || !btn_guardar?.habilitar"
+              >
+                Guardar
+              </button>
+            </div>
+          </form>
+        </div>
+      </ng-template>
+      <app-loading-overlay *ngIf="isLoading"></app-loading-overlay>
+      <div
+        class="d-flex flex-row align-items-center"
+        style="overflow: auto; padding-left: 10px; padding-right: 10px"
+      >
+        <table
+          aria-label
+          class="table table-striped border mt-4"
+          style="table-layout: fixed"
+        >
+          <thead>
+            <tr style="font-size: 12.5px; color: black; font-weight: 600">
+              <th
+                style="
+                  font-weight: 600;
+                  width: 15%;
+                  text-align: center;
+                  vertical-align: middle;
+                "
+              >
+                Titulo
+              </th>
+              <th
+                style="
+                  font-weight: 600;
+                  width: 6%;
+                  text-align: center;
+                  vertical-align: middle;
+                "
+              >
+                Contenido Video
+              </th>
+              <th
+                style="
+                  font-weight: 600;
+                  width: 14%;
+                  text-align: center;
+                  vertical-align: middle;
+                "
+              >
+                Contenido
+              </th>
+              <th
+                style="
+                  font-weight: 600;
+                  width: 5%;
+                  text-align: center;
+                  vertical-align: middle;
+                "
+              >
+                Estado
+              </th>
+              <th
+                style="
+                  font-weight: 600;
+                  width: 11%;
+                  text-align: center;
+                  vertical-align: middle;
+                "
+              >
+                Acciones
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              id="{{ catalogoTipoRegistro.id }}"
+              style="
+                text-align: center;
+                font-size: 12.5px;
+                vertical-align: middle;
+              "
+              *ngFor="
+                let plantillas of catalogoTipoRegistro
+                  | slice
+                    : (cpage - 1) * cpageSize
+                    : (cpage - 1) * cpageSize + cpageSize
+              "
+            >
+              <td style="word-wrap: break-word">
+                <ng-container>{{ plantillas.titulo }}</ng-container>
+              </td>
+              <td>
+                <ng-container>{{ plantillas.contenido_video }}</ng-container>
+              </td>
+              <td>
+                <ng-container>{{ plantillas.contenido }}</ng-container>
+              </td>
+              <td class="center-content">
+                <div class="form-check form-switch">
+                  <input
+                    type="checkbox"
+                    [checked]="plantillas.estado === 'A'"
+                    class="form-check-input"
+                    disabled
+                    style="width: 40px"
+                  />
+                </div>
+              </td>
+              <td *ngIf="permisos?.modificar || permisos?.eliminar">
+                <button
+                  (click)="onEdit(plantillas, editModal)"
+                  type="button"
+                  class="btn btn-icon-end"
+                  style="color: black"
+                  *ngIf="permisos?.modificar && !plantillas.editable"
+                >
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button
+                  type="button"
+                  (click)="onDelete(plantillas)"
+                  class="btn btn-icon-end"
+                  style="color: black"
+                  *ngIf="permisos?.eliminar"
+                >
+                  <i
+                    class="fas fa-trash-alt"
+                    *ngIf="txt_titulo_edit?.visualizar"
+                    [disabled]="
+                      !permisos?.modificar || !txt_titulo_edit?.habilitar
+                    "
+                  ></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ng-template #editModal let-modal>
+        <div class="modal-header">
+          <h2 class="modal-title">
+            <b style="color: black; font-size: xx-large">Editar Plantillas</b>
+          </h2>
+          <button
+            type="button"
+            class="btn-close"
+            aria-label="Close"
+            (click)="modal.dismiss()"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="formedit">
+            <div class="row" style="margin-bottom: 20px">
+              <div class="col-md-6" style="width: 76%">
+                <div class="input-group mb-3">
+                  <label
+                    class="input-group-text"
+                    for="titulo"
+                    style="color: black; background-color: #f3f5f7; width: 18%"
+                    >Título</label
+                  >
+                  <input
+                    maxlength="300"
+                    type="text"
+                    formControlName="titulo"
+                    class="form-control"
+                    id="titulo"
+                    [(ngModel)]="selectedTipoArchivo.titulo"
+                    style="width: 65%"
+                    *ngIf="txt_titulo_edit?.visualizar"
+                  />
+                </div>
+              </div>
+              <div class="col-md-6" style="width: 24%">
+                <div class="input-group mb-3">
+                  <label
+                    class="input-group-text"
+                    for="estado"
+                    style="color: black"
+                    >Estado</label
+                  >
+                  <div
+                    class="form-check form-switch"
+                    style="padding-left: 20px"
+                  >
+                    <input
+                      formControlName="estado"
+                      style="
+                        color: black;
+                        margin-left: 0px;
+                        width: 55px;
+                        margin-top: 8px;
+                      "
+                      id="estado"
+                      size="10"
+                      class="form-check-input"
+                      type="checkbox"
+                      (change)="onEstadoChangeEdit($event)"
+                      maxlength="300"
+                      *ngIf="cck_estado?.visualizar"
+                      [disabled]="!cck_estado?.habilitar"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- <div class="row" style="margin-bottom: 20px;">
+              <div class="col-md-6">
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="destinatario" style="color: crimson;background: white;">Correo
+                    destinatario</label>
+                  <input type="text" formControlName="destinatario" class="form-control" id="destinatario"
+                    [(ngModel)]="selectedTipoArchivo.destinatario">
+                </div>
+                <div style="text-align: center;"
+                  *ngIf="form.controls.destinatario.invalid && (form.controls.destinatario.dirty || form.controls.destinatario.touched)">
+                  <small class="text-danger" *ngIf="form.controls.destinatario.errors.required">El correo del
+                    destinatario es requerido.</small>
+                  <small class="text-danger" *ngIf="form.controls.destinatario.errors.invalidEmail">Por favor, introduce
+                    un correo electrónico válido.</small>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="copia"
+                    style="color: crimson;background: white;width: 21%;">CC</label>
+                  <input type="text" formControlName="copia" class="form-control" id="copia"
+                    [(ngModel)]="selectedTipoArchivo.copia">
+                </div>
+                <div style="text-align: center;"
+                  *ngIf="form.controls.copia.invalid && (form.controls.copia.dirty || form.controls.copia.touched)">
+                  <small class="text-danger" *ngIf="form.controls.copia.errors.multiEmail">Por favor, introduce correos
+                    electrónicos válidos separados por coma (,).</small>
+                </div>
+              </div>
+            </div> -->
+            <div class="row" style="margin-bottom: 20px">
+              <div class="col-md-6" style="width: 99%">
+                <div class="input-group mb-3">
+                  <label
+                    class="input-group-text"
+                    for="contenido_video"
+                    style="
+                      color: black;
+                      background-color: #f3f5f7;
+                      width: 104px;
+                    "
+                    >Contenido <br />
+                    Video</label
+                  >
+                  <input
+                    type="text"
+                    formControlName="contenido_video"
+                    class="form-control"
+                    id="contenido_video"
+                    [(ngModel)]="selectedTipoArchivo.contenido_video"
+                    *ngIf="txt_contenido_video_edit?.visualizar"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="row" style="margin-bottom: 20px">
+              <div class="col-md-12">
+                <div class="input-group mb-3">
+                  <label
+                    class="input-group-text"
+                    for="contenido"
+                    style="color: black; background-color: #f3f5f7"
+                    >Contenido</label
+                  >
+                  <textarea
+                    type="text"
+                    formControlName="contenido"
+                    class="form-controlLo"
+                    id="contenido"
+                    [(ngModel)]="selectedTipoArchivo.contenido"
+                    style="width: 86%"
+                    *ngIf="txt_contenido_edit?.visualizar"
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                (click)="modal.dismiss()"
+                *ngIf="btn_cancelar_edit?.visualizar"
+                [disabled]="!btn_cancelar_edit?.habilitar"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                class="btn btn-amarillo"
+                [disabled]="!form.valid"
+                (click)="
+                  onEstadoChangeEdit(form.controls['estado'].value);
+                  onSave(selectedTipoArchivo)
+                "
+                *ngIf="btn_guardar_edit?.visualizar"
+                [disabled]="!btn_guardar_edit?.habilitar"
+              >
+                Guardar cambios
+              </button>
+            </div>
+          </form>
+        </div>
+      </ng-template>
+      <div class="d-flex justify-content-between align-items-center p-2">
+        <div class="d-flex align-items-center ms-4">
+          <label for="pageSizeSelect" class="me-2">Elementos por página:</label>
+          <div>
+            <select
+              class="form-select w-auto"
+              id="pageSizeSelect"
+              [(ngModel)]="cpageSize"
+            >
+              <option [ngValue]="4">4</option>
+              <option [ngValue]="10">10</option>
+              <option [ngValue]="15">15</option>
+              <option [ngValue]="25">25</option>
+            </select>
+          </div>
+        </div>
+        <div class="d-flex justify-content-center;">
+          <ngb-pagination
+            [(page)]="cpage"
+            [maxSize]="10"
+            [pageSize]="cpageSize"
+            [collectionSize]="catalogoTipoRegistro.length"
+            class="pe-4"
+          ></ngb-pagination>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,137 @@
+<div class="row">
+    <app-loading-overlay *ngIf="isLoading"></app-loading-overlay>
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row text-start">
+                    <div class="col-md-3">
+                        <b style="color: black;font-size: xx-large;">Resumen</b>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4" *ngIf="cmb_encuesta?.visualizar">
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="mb-3">
+                                    <label style="color: black;">Comunicación: </label>
+                                </div>
+                            </div>
+                            <div class="col-md-7">
+                                <div class="mb-3">
+                                    <ng-select [(ngModel)]="encuesta_id" placeholder="Seleccione"
+                                        (change)="onChangeEncuesta($event)"
+                                        [disabled]="!permisos?.consulta || !cmb_encuesta?.habilitar">
+                                        <ng-option *ngFor="let encuesta of dataEncuesta" [value]="encuesta.id"
+                                            [ngClass]="{'hidden-option': encuesta.estado !== 'A'}">{{encuesta.nombre}}</ng-option>
+                                    </ng-select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4" *ngIf="cmb_zona?.visualizar">
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="mb-3">
+                                    <label style="color: black;">Zona: </label>
+                                </div>
+                            </div>
+                            <div class="col-md-7">
+                                <div class="mb-3">
+                                    <ng-select [(ngModel)]="zona_id" placeholder="Seleccione"
+                                        (change)="onChangeZona($event)"
+                                        [disabled]="!permisos?.consulta || !cmb_zona?.habilitar">
+                                        <ng-option *ngFor="let zona of dataZona" [value]="zona.id"
+                                            [ngClass]="{'hidden-option': zona.estado !== 'A'}">{{zona.nombre}}</ng-option>
+                                    </ng-select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4" *ngIf="cmb_hacienda?.visualizar">
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="mb-3">
+                                    <label style="color: black;">Hacienda: </label>
+                                </div>
+                            </div>
+                            <div class="col-md-7">
+                                <div class="mb-3">
+                                    <ng-select [(ngModel)]="hacienda_id" placeholder="Seleccione"
+                                        (change)="onChangeHacienda($event)"
+                                        [disabled]="!permisos?.consulta || !cmb_hacienda?.habilitar">
+                                        <ng-option *ngFor="let hacienda of dataHacienda" [value]="hacienda.id"
+                                            [ngClass]="{'hidden-option': hacienda.estado !== 'A'}">{{hacienda.nombre}}</ng-option>
+                                    </ng-select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row" style="width: 100%; justify-content: center;">
+
+                    <div class="cartilla">
+                        <div class="row">
+                            <div class="col-md-6">
+
+                                <div class="d-flex flex-column" *ngIf="chart_resumen?.visualizar"
+                                    [disabled]="!permisos?.consulta || !chart_resumen?.habilitar">
+                                    <h4>Cumplimiento</h4>
+                                    <h1>{{porcentaje_cumplimiento.toFixed(2)}}%</h1>
+                                    <p *ngIf="encuesta_id!=0">{{fecha_inicio}} - {{fecha_fin}}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <table class="table-borderless" *ngIf="chart_pastel?.visualizar"
+                                    [disabled]="!permisos?.consulta || !chart_pastel?.habilitar">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col"
+                                                style="font-weight: bold; font-size: 80%;justify-content: center;">Total
+                                            </th>
+                                            <th scope="col"
+                                                style="font-weight: bold; font-size: 80%;justify-content: center;">
+                                                {{total}}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td
+                                                style="font-weight: bold; font-size: 50%; color: orange;justify-content: center;">
+                                                No Acepta</td>
+                                            <td
+                                                style="font-weight: bold; font-size: 50%; color: orange;justify-content: center;">
+                                                {{noAcepta}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: bold; font-size: 50%; color: green;">Aceptación</td>
+                                            <td style="font-weight: bold; font-size: 50%; color: green;">{{aceptacion}}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: bold; font-size: 50%; color: red;">Pendiente</td>
+                                            <td style="font-weight: bold; font-size: 50%; color: red;">{{pendiente}}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <canvas #pieChart></canvas>
+                </div>
+            </div>
+
+
+
+        </div>
+
+
+    </div>
+</div>

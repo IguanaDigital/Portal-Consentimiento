@@ -1,0 +1,25 @@
+<div [ngSwitch]="type">
+  <!-- Text -->
+  <div class="input-group" *ngSwitchCase="'text'">
+    <div class="input-group-prepend">
+      <span class="input-group-text" id="basic-addon1">{{ label }}</span>
+    </div>
+    <input
+      type="text"
+      class="form-control"
+      [placeholder]="placeholder"
+      (keyup)="onChangeElement(key, type, $event)"
+    />
+  </div>
+  <!-- Select -->
+  <app-select
+    *ngSwitchCase="'select'"
+    [label]="label"
+    [key]="key"
+    [(options)]="options"
+    [placeholder]="placeholder"
+    [contexto]="this"
+    [onChange]="'onChangeElement'"
+  >
+  </app-select>
+</div>

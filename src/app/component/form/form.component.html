@@ -1,0 +1,33 @@
+<div class="form-container">
+  <div class="row">
+    <div
+      *ngFor="let input of options"
+      class="gy-3"
+      [ngClass]="{
+        col: input.colWidth === undefined,
+        'col-1': input.colWidth === 1,
+        'col-2': input.colWidth === 2,
+        'col-3': input.colWidth === 3,
+        'col-4': input.colWidth === 4,
+        'col-5': input.colWidth === 5,
+        'col-6': input.colWidth === 6,
+        'col-7': input.colWidth === 7,
+        'col-8': input.colWidth === 8,
+        'col-9': input.colWidth === 9,
+        'col-10': input.colWidth === 10,
+        'col-11': input.colWidth === 11,
+        'col-12': input.colWidth === 12
+      }"
+    >
+      <app-input
+        [type]="input.type"
+        [label]="input.label"
+        [options]="input.options"
+        [placeholder]="input.placeholder"
+        [key]="input.key"
+        [contexto]="this"
+        [onChange]="'onChangeElementInForm'"
+      ></app-input>
+    </div>
+  </div>
+</div>

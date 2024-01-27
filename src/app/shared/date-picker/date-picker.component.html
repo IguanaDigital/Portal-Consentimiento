@@ -1,0 +1,6 @@
+<div class="content">
+    <label class="input-group-text" for="fechaDesde" style="color: black;font-size: 14px;">{{label}}</label>
+    <input class="form-control" placeholder="mm/dd/yyyy" name="d2" #c2="ngModel" [ngModel]="value"
+        (ngModelChange)="onDateChange($event)" ngbDatepicker #d2="ngbDatepicker" />
+    <i class="far fa-calendar icon" (click)="d2.toggle()" type="button"></i>
+</div>

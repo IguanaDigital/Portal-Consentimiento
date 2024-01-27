@@ -1,0 +1,58 @@
+.pointer {
+    cursor: pointer;
+}
+
+
+
+
+.card {
+    background-color: #fff;
+}
+
+.cartilla {
+    margin-top: 4%;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    /* Agrega un borde de 1 píxel de color gris claro */
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    width: 30%;
+    height: 50%;
+
+    h4{
+        font-size: 50%;
+    }
+    p{
+        font-size: 40%;
+    }
+    h1{
+        font-weight: bold;
+    }
+}
+
+/* styles.css o tu archivo de estilos CSS del componente */
+table {
+    //border-collapse: collapse;
+    width: 100%;
+}
+
+
+th,
+td {
+    //border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+thead th {
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Añade margen en el encabezado para separar el thead y el tbody */
+thead {
+    margin-bottom: 20px;
+}
+
+tbody {
+    background-color: #fff;
+}

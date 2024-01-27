@@ -1,0 +1,84 @@
+.table-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 0 10px 10px;
+}
+table {
+  width: 100%;
+  border: 1px solid #78828c21;
+  table-layout: fixed;
+  font-size: 12.5px;
+}
+th {
+  font-weight: 600;
+  color: black;
+  text-align: center;
+  vertical-align: middle;
+}
+tbody tr:nth-child(odd) {
+  background-color: #f2f2f2;
+}
+td {
+  padding: 5px;
+}
+.pagination-container {
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  justify-content: space-between;
+}
+.check-column {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.empty-table-row {
+  height: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.search-icon {
+  cursor: pointer;
+}
+.input-search-table {
+  border: none;
+  width: 75%;
+  border-bottom: 1px solid #e3c716;
+  margin-bottom: 3px;
+}
+.input-search-date-table {
+  border: none;
+  border-bottom: 1px solid #e3c716;
+  margin-bottom: 3px;
+}
+.card-boolean-col {
+  border-radius: 100%;
+  display: inline;
+  padding: 10px;
+}
+.card-boolean-true {
+  background-color: #d1e7dd;
+  border: 1px solid #a3cfbb;
+  color: #0a3622;
+}
+.card-boolean-false {
+  background-color: #f8d7da;
+  border: 1px solid #f1aeb5;
+  color: #58151c;
+}
+.color-column {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+}
+.color-column:hover {
+  color: black;
+  text-decoration: underline black;
+}
+.box-color {
+  width: 15px;
+  height: 15px;
+  border: 2.5px solid #000000;
+}

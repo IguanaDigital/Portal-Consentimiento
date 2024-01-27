@@ -1,0 +1,41 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <!-- Titulo -->
+      <app-text textType="title-1">Consentimiento</app-text>
+      <!-- Tipo de consentimiento -->
+      <div class="row">
+        <div class="col">
+          <app-segmented
+            [segmentedOptions]="tipoConsentimientoCombo"
+            [segmentedOptionSelected]="tipoConsentimientoSelected"
+            [onSelectOption]="'onChangeTipoConsentimiento'"
+            [contexto]="this"
+          >
+          </app-segmented>
+        </div>
+        <div class="col d-flex align-items-center justify-content-end">
+          <app-export-button
+            [headerTable]="titulosTablaExport"
+            [sheetName]="'consentimientoSheet'"
+            [fileName]="'consentimiento'"
+            [dataTable]="dataTablaExport"
+          ></app-export-button>
+        </div>
+      </div>
+      <!-- Form -->
+      <app-form
+        [options]="formularioInput"
+        [onChageForm]="'onChangeForm'"
+        [contexto]="this"
+      >
+      </app-form>
+      <!-- Tabla -->
+      <app-table
+        [headerTable]="titulosTabla"
+        [dataTable]="dataTabla"
+        [paginationActive]="true"
+      ></app-table>
+    </div>
+  </div>
+</div>

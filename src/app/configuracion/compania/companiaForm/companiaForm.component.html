@@ -1,0 +1,96 @@
+<ng-template>
+    <div class="modal-header">
+      <h2 class="modal-title">
+        <b style="color: black; font-size: xx-large">Modificar Compañia</b>
+      </h2>
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Close"
+        (click)="modal.dismiss()"
+      ></button>
+    </div>
+    <div class="modal-body">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="row">
+          <div class="col">
+            <div class="input-group mb-3">
+              <label
+                class="input-group-text"
+                for="nombre"
+                style="color: black; background-color: #f3f5f7"
+                >Compañia</label
+              >
+              <input
+                maxlength="300"
+                class="form-control"
+                type="text"
+                formControlName="nombre"
+                id="nombre"
+                style="width: 65%"
+                maxlength="300"
+              />
+            </div>
+          </div>
+          <div class="col">
+            <div class="input-group mb-3">
+              <label
+                class="input-group-text"
+                for="nombre"
+                style="color: black; background-color: #f3f5f7"
+                >Correo</label
+              >
+              <input
+                maxlength="300"
+                class="form-control"
+                type="text"
+                formControlName="nombre"
+                id="nombre"
+                style="width: 65%"
+                maxlength="300"
+              />
+            </div>
+          </div>
+          <div class="col">
+            <div class="input-group mb-3">
+              <label
+                class="input-group-text"
+                for="nombre"
+                style="color: black; background-color: #f3f5f7"
+                >Tipo</label
+              >
+              <select
+                id="tipoArchivo"
+                class="form-select fz-10 text-center"
+              >
+                <ng-container *ngFor="let campania of catalogoCampanias">
+                  <option
+                    *ngIf="campania.estado === 'A'"
+                    [value]="campania.id"
+                  >
+                    {{ campania.nombre }}
+                  </option>
+                </ng-container>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="modal.dismiss()"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="btn btn-amarillo"
+            [disabled]="!form.valid"
+          >
+            Guardar
+          </button>
+        </div>
+      </form>
+    </div>
+  </ng-template>

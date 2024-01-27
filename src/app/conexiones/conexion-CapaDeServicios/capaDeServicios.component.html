@@ -1,0 +1,293 @@
+<div class="row">
+  <div class="col-md-12">
+
+    <div class="card">
+      <div>
+        <h2 class="text-start p-3">
+          <div class="row">
+            <div class="col-md-4">
+              <b style="font-size: xx-large;">Capa de servicios</b>
+            </div>
+
+            <div class="col-md-8 text-end">
+              <button *ngIf="permisos?.exportar && btn_exportar?.visualizar" (click)="exportToExcelCapaDeServicio()" type="button"
+                class="mr-10 fz-14 btn btn-export" [disabled]="!btn_exportar?.habilitar">
+                <i class="fas fa-file-excel"></i> Exportar
+              </button>
+              <button *ngIf="permisos?.nuevo && btn_editar?.visualizar"(click)="mostrarModalCrearCapaDeServicio()"
+                [disabled]="!procesosSelect.value || !btn_editar?.habilitar" type="button" class="mr-10 fz-14 btn btn-amarillo btn-icon-end">
+                <i class="fas fa-plus"></i> Agregar
+              </button>
+            </div>
+          </div>
+          <p> </p>
+          <app-loading-overlay *ngIf="isLoading && cmb_proceso?.visualizar"></app-loading-overlay>
+          <div class="col-md-4" >
+            <div class="input-group mb-3" >
+
+              <label class="input-group-text fz-10" for="filtroSelect">Procesos </label>
+              <select (change)="onIdCapaServicioChange($event)" #procesosSelect style="text-align: center"
+                id="tipoArchivo" class="form-select fz-10" [disabled]="!cmb_proceso?.habilitar">
+                <option value="" hidden>Selecccione</option>
+                <ng-container *ngFor="let proceso of dataProceso">
+                  <option *ngIf="proceso.estado==='A'" [value]="proceso.id" [attr.data-proceso]="proceso.proceso"  >
+                    {{proceso.proceso}}</option>
+                </ng-container>
+              </select>
+            </div>
+          </div>
+        </h2>
+      </div>
+
+      <!--Table Capa de servicio -->
+      <app-loading-overlay *ngIf="isLoading"></app-loading-overlay>
+      <div class="d-flex flex-row align-items-center px-2 overflow-auto">
+        <table aria-label class="table table-striped border mt-4" id="table-consulta">
+          <thead>
+            <tr style="font-size: 12.5px;font-weight: 600;">
+
+              <th style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">Url</th>
+              <th style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">Descripción</th>
+              <th style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">Tipo de petición</th>
+              <th style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">Estado</th>
+              <th *ngIf="permisos?.modificar || permisos?.eliminar"
+                style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">Acciones</th>
+
+            </tr>
+          </thead>
+
+          <tbody *ngIf=" IdProcesoSeleccionado">
+            <tr style="text-align: center; font-size: 12.5px;vertical-align: middle;"
+              *ngFor="let servicio of dataCapaDeServicio.slice((cpage-1) * cpageSize, cpage * cpageSize)">
+              <td>{{ servicio.url}}</td>
+              <td>{{ servicio.descripcion}}</td>
+              <td>{{ servicio.tipo_peticion}}</td>
+              <td *ngIf="servicio.estado=='A'">
+                <div class="form-switch">
+                  <input id="estadoC" style=" font-size: 12px; color: rgb(227, 199, 22);" size="10" class="form-check-input"
+                    type="checkbox" [(ngModel)]="isCheckedEstado1" disabled>
+                </div>
+              </td>
+              <td *ngIf="servicio.estado=='I'">
+                <div class="form-switch">
+                  <input id="estadoC" style=" font-size: 12px; color: crgb(227, 199, 22);" size="10" class="form-check-input"
+                    type="checkbox" [(ngModel)]="isCheckedEstado2" disabled>
+                </div>
+              </td>
+              <td *ngIf="permisos?.modificar || permisos?.eliminar">
+                <button  (click)="mostrarModalUpdateCapaDeServicio(servicio.id,servicio.id_proceso,
+              servicio.descripcion,servicio.url,servicio.tipo_peticion,servicio.estado)" type="button"
+                  class="btn btn-icon-end" *ngIf="permisos?.modificar && btn_editar?.visualizar" [disabled]="!btn_editar?.habilitar">
+                  <i class="fas fa-edit" style="color: black;"></i>
+                </button>
+                <button *ngIf="permisos?.modificar && btn_eliminar?.visualizar" [disabled]="!btn_eliminar?.habilitar" (click)="onDeleteCapaDeServicio(servicio.id)" type="button"
+                  class="btn btn-icon-end">
+                  <i class="fas fa-trash-alt" style="color: black;"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!--End Table Capa de servicio -->
+
+      <!--Crear Capa de servicio-->
+      <ng-template #myModalCrearCapaDeServicio let-modal>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card">
+              <div>
+                <h2 class="card-body text-start">
+                  <div class="row">
+                    <div class="col-md-7">
+                      <b style="color: black;font-size: xx-large;margin: 20px;">Crear capa de servicios</b>
+                    </div>
+
+                    <div class="col-md-5 text-end">
+                      <button *ngIf="btn_cancelar?.visualizar" style="margin: 10px; background-color: #fff !important;
+                      color: black;" type="button" (click)="modal.dismiss(onTipoMenuSeleccionado = null)" [disabled]="!btn_cancelar?.habilitar"
+                        class="mr-10 fz-14 btn btn-black btn-icon-end">Cancelar
+                      </button>
+
+                      <button *ngIf="btn_guardar?.visualizar" (click)="onSaveCapaDeServicio()" type="button"
+                        class="mr-10 fz-14 btn btn-amarillo btn-icon-end" aria-label="Close" aria-label="Close" [disabled]="!btn_guardar?.habilitar">
+                        <i class="fas fa-save"></i> Guardar
+                      </button>
+                    </div>
+                  </div>
+                  <p> </p>
+                  <div class="d-flex flex-row align-items-center"
+                    style="overflow: auto;padding-left: 20px;padding-right: 10px;">
+                    <div class="col-md-4" style="width: 50%;" *ngIf="txt_url?.visualizar" >
+                      <div class="input-group mb-3">
+                        <label class="input-text" for="URL"
+                          style="  padding-top:8px;  font-size: 15px;color: black;width: 31%; background-color: rgba(255, 255, 255, 0);">URL</label>
+                        <div style="width: 60%; padding-top:0px; ">
+                          <textarea maxlength="100" style="  border-radius: 5px; border-color: rgb(192, 186, 184);"
+                            class="form-control" id="URL" placeholder="Escriba" [disabled]="!txt_url?.habilitar || !txt_url?.modificar"></textarea>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="col-md-4" style="width: 50%;" *ngIf="txt_descripcion?.visualizar">
+                      <div class="input-group mb-3">
+                        <label class="input-text" for="descripcion"
+                          style="  padding-top:8px;  font-size: 15px;color: black;width: 35%; background-color: rgba(255, 255, 255, 0);">Descripción</label>
+                        <div style="width: 60%; padding-top:0px; ">
+                          <textarea maxlength="100" style="  border-radius: 5px; border-color: rgb(192, 186, 184);"
+                            class="form-control" id="descripcion" placeholder="Escriba" [disabled]="!txt_descripcion?.habilitar || !txt_descripcion?.modificar"></textarea>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="d-flex flex-row align-items-center"
+                    style="overflow: auto;padding-left: 20px;padding-right: 10px;">
+
+                    <div class="col-md-4" style="width: 50%;padding-left: 10px;" *ngIf="cck_estado?.visualizar">
+                      <div class="input-group mb-3" >
+                        <label class="input-text" for="estado"
+                          style="   font-size: 15px;color: black; background-color: rgba(255, 255, 255, 0);">Estado</label>
+                        <div class="form-check form-switch" style="width: 50%;padding-left: 90px; padding-top: 0px; ">
+                          <input style=" font-size: 12px; color: black;  " id="estado" checked size="10"
+                            class="form-check-input" type="checkbox" [disabled]="!cck_estado?.habilitar">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="col-md-4" style="width: 50%;" *ngIf="cmb_tipo_peticion?.visualizar">
+                      <div class="input-group mb-3">
+                        <label class="input-text" for="TipoPeticion"
+                          style="  padding-top:8px;  font-size: 15px;color: black;width: 35%; background-color: rgba(255, 255, 255, 0);">Tipo
+                          de petición</label>
+                        <div style="width: 36%; padding-top:0px; ">
+                          <select style=" border-radius: 5px; border-color: rgb(192, 186, 184); text-align: center;"
+                            id="TipoPeticion" (change)="onTipoPeticion($event)" class="form-select fz-14" [disabled]="!cmb_tipo_peticion?.habilitar">
+                            <option value="" hidden>Selecccione</option>
+                            <option value="GET"> GET</option>
+                            <option value="POST"> POST</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </h2>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+      <!--End Modal Crear Capa de servicio-->
+
+      <!--Modal Update Capa de servicio-->
+      <ng-template #myModalUpdateCapaDeServicio let-modal>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card">
+              <div>
+                <h2 class="card-body text-start">
+                  <div class="row">
+                    <div class="col-md-7">
+                      <b style="color: black;font-size: xx-large;margin: 20px;">Editar capa de servicios</b>
+                    </div>
+
+                    <div class="col-md-5 text-end" >
+                      <button style="margin: 10px; background-color: rgb(255, 255, 255 ) !important;
+                      color: black;" type="button" (click)="modal.dismiss(onTipoMenuSeleccionado = null)"
+                        class="mr-10 fz-14 btn btn-black btn-icon-end" *ngIf="btn_cancelar_edit?.visualizar" [disabled]="!btn_cancelar_edit?.habilitar" >Cancelar
+                      </button>
+
+                      <button (click)="onEditarCapaDeServicio(id)" type="button"
+                        class="mr-10 fz-14 btn btn-amarillo btn-icon-end" aria-label="Close" aria-label="Close" *ngIf="btn_guardar_edit?.visualizar" [disabled]="!btn_guardar_edit?.habilitar">
+                        <i class="fas fa-save"></i> Guardar
+                      </button>
+                    </div>
+                  </div>
+                  <p> </p>
+                  <div class="d-flex flex-row align-items-center"
+                    style="overflow: auto;padding-left: 20px;padding-right: 10px;">
+                    <div class="col-md-4" style="width: 50%;" *ngIf="txt_url_edit?.visualizar">
+                      <div class="input-group mb-3">
+                        <label class="input-text" for="URLM"
+                          style="  padding-top:8px;  font-size: 15px;color: black;width: 31%; background-color: rgba(255, 255, 255, 0);">URL</label>
+                        <div style="width: 60%; padding-top:0px; ">
+                          <textarea maxlength="100" [value]="url"
+                            style="  border-radius: 5px; border-color: rgb(192, 186, 184);" class="form-control"
+                            id="URLM" placeholder="Escriba"> [disabled]="!txt_url_edit?.habilitar || !txt_descripcion?.modificar"</textarea>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="col-md-4" style="width: 50%;" *ngIf="txt_descripcion_edit?.visualizar">
+                      <div class="input-group mb-3">
+                        <label class="input-text" for="descripcionM"
+                          style="  padding-top:8px;  font-size: 15px;color: black;width: 35%; background-color: rgba(255, 255, 255, 0);">Descripción</label>
+                        <div style="width: 60%; padding-top:0px; ">
+                          <textarea maxlength="100" [value]="descripcion"
+                            style="  border-radius: 5px; border-color: rgb(192, 186, 184);" class="form-control"
+                            id="descripcionM" placeholder="Escriba" [disabled]="!txt_descripcion_edit?.habilitar"></textarea>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="d-flex flex-row align-items-center"
+                    style="overflow: auto;padding-left: 20px;padding-right: 10px;">
+
+                    <div class="col-md-4" style="width: 50%;padding-left: 10px;" *ngIf="cck_estado_edit?.visualizar">
+                      <div class="input-group mb-3">
+                        <label class="input-text" for="estadoM"
+                          style="   font-size: 15px;color: black; background-color: rgba(255, 255, 255, 0);">Estado</label>
+                        <div class="form-check form-switch" style="width: 50%;padding-left: 90px; padding-top: 0px; ">
+                          <input style=" font-size: 12px; color: black;  " id="estadoM" [(ngModel)]="isChecked"
+                            [value]="estado" size="10" class="form-check-input" type="checkbox" [disabled]="!cck_estado_edit?.habilitar">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="col-md-4" style="width: 50%;" *ngIf="cmb_tipo_peticion_edit?.visualizar">
+                      <div class="input-group mb-3">
+                        <label class="input-text" for="TipoPeticionM"
+                          style="  padding-top:8px;  font-size: 15px;color: black;width: 35%; background-color: rgba(255, 255, 255, 0);">Tipo
+                          de petición</label>
+                        <div style="width: 36%; padding-top:0px; ">
+                          <select [(ngModel)]="onTipoPeticionSeleccionado"
+                            style=" border-radius: 5px; border-color: rgb(192, 186, 184); text-align: center;"
+                            id="TipoPeticionM" (change)="onTipoPeticion($event)" class="form-select fz-14" [disabled]="!cmb_tipo_peticion_edit?.habilitar">
+                            <option value="" hidden>Selecccione</option>
+                            <option value="GET"> GET</option>
+                            <option value="POST"> POST</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </h2>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+      <!--End Modal Update Capa de servicio-->
+
+      <div class="d-flex justify-content-between align-items-center p-2">
+
+        <div class="d-flex align-items-center me-2" style="padding-left: 20px;">
+          <label for="pageSizeSelect" class="me-2">Vista:</label>
+          <div>
+            <select class="form-select" style="width: auto" id="pageSizeSelect" [(ngModel)]="cpageSize">
+              <option [ngValue]="4">4</option>
+              <option [ngValue]="10">10</option>
+              <option [ngValue]="15">15</option>
+              <option [ngValue]="25">25</option>
+            </select>
+          </div>
+        </div>
+        <div class="d-flex justify-content-center">
+          <ngb-pagination [(page)]="cpage" [maxSize]="10" [pageSize]="cpageSize"
+            [collectionSize]="totalLengthOfCollection" style="padding-right: 20px;"></ngb-pagination>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

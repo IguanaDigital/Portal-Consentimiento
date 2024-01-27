@@ -1,0 +1,14 @@
+.segmented-control{
+  margin: 10px;
+}
+.segmented-item {
+  padding: 8px 16px;
+  border: none;
+  background-color: #eee;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.3s ease-in-out;
+}
+.segmented-item.active {
+  background-color: #e3c716;
+}

@@ -1,0 +1,132 @@
+.pointer{
+	cursor: pointer;
+}
+
+th[sortable].asc, th[sortable].desc{
+	display: flex;
+	border: 0px;
+}
+th[sortable].asc:after, th[sortable].desc:after {
+    content: "";
+    display: block;
+    background: url(../../../assets/images/custom-select.png) no-repeat left center;
+    background-size: 12px;
+    width: 25px;
+    height: 25px;
+    position: relative;
+    right:-12px;
+    margin-right: -22px;
+}
+th[sortable].desc:after{
+	transform: rotate(180deg);
+	background-position: right center;
+}
+:host {
+    align-items: center;
+  }
+
+  .reduce-width {
+    max-width: 100px;
+  }
+  table {
+    width: 100%;
+    table-layout: auto;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    padding: 5px;
+  }
+  .resultado-cargado {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .mensaje-cargado {
+    margin-right: 5px;
+  }
+
+  .mensaje-resultado {
+    margin-left: 5px;
+  }
+  .input-group {
+    margin-bottom: 20px;
+  }
+
+  .form-control {
+    border-radius: 0;
+  }
+
+  .btn-primary {
+    background-color: #000;
+    border-color: #000;
+  }
+
+  .btn-primary:hover {
+    background-color: #000;
+    border-color: #000;
+  }
+
+
+  .filter-container {
+    margin-bottom: 10px;
+  }
+
+  .filter-container input[type=text] {
+    width: 100%;
+    padding: 8px 16px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    box-sizing: border-box;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    background-color: #f8f8f8;
+    font-size: 16px;
+    transition: 0.3s;
+  }
+
+  .filter-container input[type=text]:focus {
+    border: 2px solid #555;
+  }
+  select option:hover {
+    background-color: black;
+  }
+
+  .my-option:hover{
+    background-color: rgb(92, 13, 240) !important;
+    color: rgb(255, 255, 255);
+  }
+  .my-select option:hover{
+    background-color: rgb(0, 13, 254) !important;
+  }
+  .my-select select:hover {
+    background-color: rgb(0, 30, 255);
+  }
+
+  .btn-export {
+    --bs-btn-color: #FFF;
+    --bs-btn-bg: #77797a;
+    --bs-btn-border-color: #cccccc;
+    --bs-btn-hover-color: #4f5467;
+    --bs-btn-hover-bg: #d4d4d4;
+    --bs-btn-hover-border-color: #d1d1d1;
+    --bs-btn-focus-shadow-rgb: 173, 173, 173;
+    --bs-btn-active-color: #000;
+    --bs-btn-active-bg: #d6d6d6;
+    --bs-btn-active-border-color: #d1d1d1;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: #000;
+    --bs-btn-disabled-bg: #cccccc;
+    --bs-btn-disabled-border-color: #cccccc;
+  }
+  
+  .btn-export:hover,
+  .btn-outline-export:hover {
+    box-shadow: 0 8px 15px rgba(179, 157, 13, 0.3);
+  }
+
+  .card {
+    background-color: #fff;
+  }
+
+  

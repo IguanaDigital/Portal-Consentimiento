@@ -1,0 +1,44 @@
+.content {
+    /* This bit sets up the horizontal layout */
+    display: flex;
+    flex-direction: row;
+
+    /* This bit draws the box around it */
+    border: 1px solid;
+    border-color: rgb(243, 245, 247);
+
+    /* I've used padding so you can see the edges of the elements. */
+    padding-right: 0.5rem;
+    padding-left: 0;
+}
+
+input {
+    /* Tell the input to use all the available space */
+    flex-grow: 2;
+    /* And hide the input's outline, so the form looks like the outline */
+    border: none;
+    font-size: 14px;
+}
+
+/* remove the input focus blue box, it will be in the wrong place. */
+input:focus {
+    outline: none;
+}
+
+/* Add the focus effect to the form so it contains the button */
+form:focus-within {
+    outline: 1px solid;
+}
+
+.fa-calendar {
+    /* Just a little styling to make it pretty */
+    text-align: center;
+    color: darkgray;
+    padding: 6px 1px;
+    font-size: 18px;
+
+}
+
+.fa-calendar:hover {
+    color: gray;
+}

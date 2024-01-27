@@ -1,0 +1,80 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+# compiled output
+/dist
+/tmp
+/out-tsc
+
+# dependencies
+/node_modules
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vs
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# misc
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+/typings
+
+# System Files
+.DS_Store
+Thumbs.db
+.angular
+
+# Ignora los archivos generados por Angular CLI
+/dist
+/node_modules
+
+# Ignora el archivo de configuración de desarrollo
+#/angular.json
+
+# Ignora el archivo de configuración de ambiente local
+/environment.ts
+
+# Ignora el archivo de ambiente de producción (si lo usas)
+/environment.prod.ts
+
+# Ignora el archivo de bloqueo de versiones de npm
+#/package-lock.json
+
+# Ignora las dependencias de desarrollo específicas de tu entorno
+#/tsconfig.json
+#/tsconfig.app.json
+#/tsconfig.spec.json
+
+# Ignora los archivos de pruebas generados por Karma
+/karma.conf.js
+/jasmine.json
+
+# Ignora los archivos de configuración de Protractor (pruebas E2E)
+/protractor.conf.js
+/protractor-ci.conf.js
+
+# Ignora los registros de errores generados por las pruebas
+/coverage
+
+# Ignora las dependencias globales de TypeScript (si las tienes)
+typings
+
+# Ignora archivos de configuración específicos del IDE (puedes agregar más según tu IDE)
+.idea
+.vscode

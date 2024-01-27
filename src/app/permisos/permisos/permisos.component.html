@@ -1,0 +1,308 @@
+
+<div class="row">
+  <div class="col-md-12"> 
+    <div class="card">
+      <div>
+        <h2 class="card-body text-start">
+          <b style="color: black;font-size: xx-large;">Permisos</b>
+          <div class="text-end">
+            <button type="button" (click)="exportToExcelPermisos()" class="mr-10 fz-14 btn btn-export"
+              style="margin-right: 20px;width: 10%;font-size: 14px;" *ngIf="btn_exportar?.visualizar && permisos?.exportar"  [disabled]="!permisos?.exportar || !btn_exportar?.habilitar">
+          
+              <i class="fas fa-file-excel"></i> Exportar
+            </button>
+            <button type="button" class="btn btn-amarillo btn-icon-end" (click)="openModal(content)"
+              style="margin-right: 10px;width: 10%;font-size: 14px;" *ngIf="permisos?.nuevo && btn_agregar?.visualizar" [disabled]=" !btn_agregar?.habilitar" >
+             
+              <i class="fas fa-plus fs-3 me-1"></i>Agregar
+            </button>
+          </div>
+          <p>  </p>
+          <div  class="row">
+            
+          <div class="col-md-3">
+               <div class="input-group mb-3" *ngIf="cmb_encuesta?.visualizar">
+                  <label class="input-group-text fz-10" for="filtroSelect" style="color: black;">  Encuesta</label>
+                  <select  (change)="onChangeEncuesta($event)" style="text-align: center" id="tipoArchivo" class="form-select fz-10" [disabled]="!cmb_encuesta?.habilitar">
+                    <option hidden>Selecciona</option>
+                    <option  hidden>Selecccione</option>
+                    <ng-container *ngFor="let encuesta of dataEncuesta">
+                     <option  *ngIf="encuesta.estado==='A'" [value]="encuesta.id"> {{encuesta.nombre}}</option>
+                    </ng-container>
+                  </select>
+              </div>
+            </div>
+
+            <div class="col-md-3">
+              <div class="input-group mb-3" *ngIf="cmb_dispositivo?.visualizar">
+                 <label class="input-group-text fz-10" for="filtroSelect" style="color: black;">Dispositivo  </label>
+                 <select  (change)="onChangeDispositivo($event)" style="text-align: center" id="tipoArchivo" class="form-select fz-10" [disabled]="!cmb_dispositivo?.habilitar">
+                   <option  value=""  hidden>Selecccione</option>
+                   <ng-container *ngFor="let dispositivo of dataDispositivo">
+                    <option  *ngIf="dispositivo.estado==='A'" [value]="dispositivo.id" > {{ dispositivo.nombre}}</option>
+                   </ng-container>
+                 </select>
+             </div>
+           </div>
+                      
+            
+          </div>
+        </h2>
+      </div>
+
+      <ng-template #content let-modal>
+        <div class="modal-header">
+          <h2 class="modal-title"><b style="color: black;font-size: xx-large;">Crear permisos</b></h2>
+          <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+        </div>
+        <div class="modal-body" >
+          <form  (ngSubmit)="onSubmit()" >
+            <!--<div class="row" style="margin-bottom: 20px;">
+              <div class="col-md-8" style="width: 76%;">
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="nombre"
+                    style="color: black;background: rgb(227, 199, 22);width: 18%;">Nombre</label>
+                  <input maxlength="300" class="form-control" type="text" formControlName="nombre" id="nombre"
+                    placeholder="nombre" style="width: 65%;" maxlength="300">
+                </div>
+              </div>
+              <div class="col-md-4" style="width: 24%;">
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="estado" style="color: black;background: rgb(227, 199, 22);">Estado</label>
+                  <div class="form-check form-switch" style="padding-left: 20px;">
+                    <input style="color: black;margin-left: 0px;width: 55px;margin-top: 8px;"
+                      id="estado" size="10" class="form-check-input" type="checkbox"
+                      [checked]="form.get('estado').value === 'A'" (change)="onEstadoChange($event)">
+                  </div>
+                </div>
+              </div>
+            </div>-->
+            <div class="row" style="margin-bottom: 20px;">
+              <div class="col-md-6" *ngIf="cmb_zona?.visualizar">
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="destinatario" style="color: black;background: #f3f5f7;">Zona</label>
+                    <select   style="text-align: center" id="tipoArchivo" class="form-select fz-10"  (change)="onChangeZona($event)"  [disabled]="!cmb_zona?.habilitar">
+                      <option   hidden>Selecccione</option>
+                      <ng-container *ngFor="let zona of dataZona">
+                        <option *ngIf="zona.estado==='A'" [value]="zona.id"> {{ zona.nombre}}</option>
+                      </ng-container>
+                    </select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="input-group mb-3" *ngIf="cmb_hacienda?.visualizar">
+                  <label class="input-group-text" for="copia"
+                    style="color: black;background: #f3f5f7;width: 25%;">Hacienda</label>
+                    <select   style="text-align: center" id="plantilla" class="form-select fz-10" (change)="onChangeHacienda($event)" [disabled]="!cmb_hacienda?.habilitar">
+                      <option  hidden>Selecccione</option>
+                      <ng-container *ngFor="let hacienda of dataHacienda">
+                        <option  *ngIf="hacienda.estado==='A'" [value]="hacienda.id">{{hacienda.nombre}}</option>
+                      </ng-container>
+                    </select>
+                </div>
+              </div>
+              
+              <div class="col-md-4" style="width: 24%;" *ngIf="cck_estado?.visualizar">
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="estado" style="color: black;background-color: #f3f5f7;">Estado</label>
+                  <div class="form-check form-switch" style="padding-left: 20px;">
+                    <input style="color: black;margin-left: 0px;width: 55px;margin-top: 8px;"
+                      id="estado" size="10" class="form-check-input" type="checkbox"
+                      [checked]="estado_permiso" (change)="onEstadoChange($event)" [disabled]="!cck_estado?.habilitar">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!--<div class="row" style="margin-bottom: 20px;">
+              <div class="col-md-5">
+                <div class="input-group mb-3">
+                  <app-date-picker label="Fecha inicio:"  [value]="fecha_inicio"  (change)="onFechaDesdeChange($event)"></app-date-picker>
+                </div>
+              </div>
+              <div class="col-md-5">
+                <div class="input-group mb-3">
+                  <app-date-picker label="Fecha fin:" [value]="fecha_fin"  (change)="onFechaHastaChange($event)"></app-date-picker>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="habilitar_noaceptar" style="color: black;background: rgb(227, 199, 22);">No aceptar</label>
+                  <div class="form-check form-switch" style="padding-left: 20px;">
+                    <input style="color: black;margin-left: 0px;width: 55px;margin-top: 8px;"
+                      id="estado" size="10" class="form-check-input" type="checkbox"
+                      [checked]="form.get('habilitar_noaceptar').value === true" (change)="onEstadoNoAceptarChange($event)">
+                  </div>
+                </div>
+              </div>
+            </div>-->
+            <div class="modal-footer">
+              <button *ngIf="btn_cancelar?.visualizar"type="button" class="btn btn-secondary" (click)="modal.dismiss()" [disabled]="!btn_cancelar?.habilitar">Cancelar</button>
+              <button *ngIf="btn_guardar?.visualizar" type="submit" class="btn btn-amarillo" [disabled]="!btn_cancelar?.habilitar">Guardar</button>
+            </div>
+          </form>
+        </div>
+      </ng-template>
+  
+      <div class="tabla-container" 
+        style="overflow: auto;padding-left: 10px;padding-right: 10px;">
+        <!--Table -->
+
+        <app-loading-overlay *ngIf="isLoading"></app-loading-overlay>
+       
+        <table   aria-label class="table table-striped border mt-4" id="table-usuario">
+          <thead style=" padding-left:10px;padding-right:10px; font-size: 12.5px;color: black;">
+            <tr  style=" font-size: 12.5px;color: black;">
+             
+              <p hidden><th style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">Dispositivo</th></p>
+              <th style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">Indentificador</th>
+              <p hidden><th style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">Encuesta</th></p>
+              <th style="font-weight: 600;width: 10%;text-align: center;vertical-align: middle;">Zona</th>
+              <th style="font-weight: 600;width: 5%;text-align: center;vertical-align: middle;">Hacienda</th>
+              <th style="font-weight: 600;width: 5%;text-align: center;vertical-align: middle;">Estado</th>
+              <th style="font-weight: 600;width: 5%;text-align: center;vertical-align: middle;">Acciones</th>
+             
+            </tr>
+          </thead> 
+          <tbody >
+            <tr style="text-align: center; font-size: 12.5px;vertical-align: middle;"
+            *ngFor="let permi of dataPermisoTabla">
+            <p hidden><td >{{ permi.dispositivo }}</td></p>
+            <td>{{ permi.identificador }}</td>
+            <p hidden><td>{{ permi.encuesta }}</td></p>
+            <td>{{permi.zona}}</td>
+            <td>{{ permi.hacienda }}</td>
+            <td class="center-content">
+              <div class="form-check form-switch">
+                <input type="checkbox" [checked]="permi.estado === 'A'" class="form-check-input" disabled
+                  style="width: 40px;">
+              </div>
+            </td>
+            <td >
+              <button  (click)="onEdit(permi, editModal)"
+                  type="button" class="btn btn-icon-end" style="color: black;" *ngIf="permisos?.modificar && btn_editar?.visualizar" [disabled]="!btn_editar?.habilitar">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button type="button" (click)="onDelete(permi)" class="btn btn-icon-end"
+                  style="color: black;" *ngIf="permisos?.eliminar && btn_eliminar?.visualizar" [disabled]="!btn_eliminar?.habilitar">
+                  
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+            </td>
+               
+            <!-- <td><input [(ngModel)]="permisos.visualizar" id="visualizar" style="accent-color: black;" type="checkbox" > </td>
+            
+
+            <td><input [(ngModel)]="permisos.nuevo"      [disabled]=" (permisos.menu === 'Active directory')||(permisos.menu === 'Logs')||(permisos.menu === 'Permisos')||(permisos.menu === 'Usuarios')||(permisos.menu === 'Seguridad')||(permisos.menu === 'Catálogos')||(permisos.menu === 'Ajustes de servidor')||(permisos.menu === 'Correo')||(permisos.menu === 'Base de datos')||(permisos.menu === 'SFTP')||(permisos.dominio === 'Adquirencia') || (permisos.menu === 'Adquirencia') || (permisos.menu === 'Notificación')||(permisos.menu === 'Configuración')||(permisos.menu === 'Información general')||(permisos.menu === 'Conexiones')"  id="nuevo" style="accent-color: crimson;" type="checkbox"></td>
+            <td><input [(ngModel)]="permisos?.modificar"     [disabled]=" (permisos.menu === 'Logs')||(permisos.menu === 'Seguridad')||(permisos.menu === 'Catálogos')||(permisos.menu === 'Correo')||(permisos.menu === 'Notificación')|| (permisos.menu === 'Consulta')||(permisos.menu === 'Adquirencia')|| (permisos.menu === 'Configuración')||(permisos.menu === 'Conexiones')"     id="editar"     style="accent-color: crimson;" type="checkbox"></td>
+            <td><input [(ngModel)]="permisos.eliminar"   [disabled]=" (permisos.menu === 'Active directory')||(permisos.menu === 'Logs')||(permisos.menu === 'Permisos')||(permisos.menu === 'Roles')||(permisos.menu === 'Usuarios')||(permisos.menu === 'Seguridad')||(permisos.menu === 'Catálogos')||(permisos.menu === 'Ajustes de servidor')||(permisos.menu === 'Correo')||(permisos.menu === 'Errores')||(permisos.menu === 'Base de datos')||(permisos.menu === 'SFTP')||(permisos.menu === 'Conexiones')||(permisos.dominio === 'Adquirencia') || (permisos.menu === 'Adquirencia') || (permisos.menu === 'Notificación')||(permisos.menu === 'Configuración')||(permisos.menu === 'Información general')"    id="eliminar"   style="accent-color: crimson;" type="checkbox"></td>
+            <td><input [(ngModel)]="permisos.exportar"   [disabled]=" (permisos.menu === 'Seguridad')||(permisos.menu === 'Catálogos')||(permisos.menu === 'Correo')||(permisos.menu === 'Conexiones')||(permisos.menu === 'Notificación')||(permisos.menu === 'Adquirencia')||(permisos.menu === 'Configuración')||(permisos.menu === 'Información general')"     id="exportar"   style="accent-color: crimson;" type="checkbox"></td>
+            <td><input [(ngModel)]="permisos.importar"   [disabled]=" (permisos.menu === 'Active directory')||(permisos.menu != 'Otros bancos' )"  id="importar"   style="accent-color: crimson;" type="checkbox"></td>
+            <td><input [(ngModel)]="permisos?.procesar"    [disabled]=" (permisos.menu === 'Logs')||(permisos.menu != 'Otros bancos' && permisos.menu != 'Consulta')" id="generar"    style="accent-color: crimson;" type="checkbox"></td>
+            <td><input [(ngModel)]="permisos.enmascarar" [disabled]=" (permisos.menu === 'Active directory')||(permisos.menu === 'Logs')||(permisos.menu === 'Permisos')||(permisos.menu === 'Roles')||(permisos.menu === 'Usuarios')||(permisos.menu === 'Seguridad')||(permisos.menu === 'Catálogos')||(permisos.menu === 'Ajustes de servidor')||(permisos.menu === 'Correo')||(permisos.menu === 'Errores')|| (permisos.menu === 'Base de datos')||(permisos.menu === 'SFTP')||(permisos.menu === 'Conexiones')||(permisos.menu === 'Notificación')||(permisos.menu === 'Adquirencia')||(permisos.menu === 'Configuración')||(permisos.menu === 'Información general')||(permisos.menu === 'Estructura del menú')||(permisos.menu === 'Enmascaramiento')||(permisos.menu === 'Procesos Automático')||(permisos.menu === 'Estructura de archivo')
+              ||(permisos.menu === 'Número de cuenta')||(permisos.menu === 'Tipo de cuenta')||(permisos.menu === 'Interfaces')||(permisos.menu === 'Tipo de registro')||(permisos.dominio === 'Configuración')||(permisos.dominio === 'Procesos Automático')||(permisos.menu === 'Tipo de Archivo')
+              ||(permisos.menu === 'Plantillas')||(permisos.menu === 'Capas de servicios')||(permisos.menu === 'Ambientes')"   id="enmascarar" style="accent-color: crimson;" type="checkbox"></td>
+             -->
+            </tr>           
+          </tbody> 
+        </table>
+        <!--End Table -->
+
+     
+      </div>
+         
+      <ng-template #editModal let-modal>
+        <div class="modal-header">
+          <h2 class="modal-title"><b style="color: black;font-size: xx-large;">Editar permiso</b></h2>
+          <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+        </div>
+        <div class="modal-body" >
+            <!--<div class="row" style="margin-bottom: 20px;">
+              <div class="col-md-8" style="width: 76%;">
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="nombre"
+                    style="color: black;background: rgb(227, 199, 22);width: 18%;">Nombre</label>
+                  <input maxlength="300" class="form-control" type="text" formControlName="nombre" id="nombre"
+                    placeholder="nombre" style="width: 65%;" maxlength="300">
+                </div>
+              </div>
+              <div class="col-md-4" style="width: 24%;">
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="estado" style="color: black;background: rgb(227, 199, 22);">Estado</label>
+                  <div class="form-check form-switch" style="padding-left: 20px;">
+                    <input style="color: black;margin-left: 0px;width: 55px;margin-top: 8px;"
+                      id="estado" size="10" class="form-check-input" type="checkbox"
+                      [checked]="form.get('estado').value === 'A'" (change)="onEstadoChange($event)">
+                  </div>
+                </div>
+              </div>
+            </div>-->
+            <div class="row" style="margin-bottom: 20px;">
+              <div class="col-md-6" *ngIf="cmb_zona_edit?.visualizar">
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="destinatario" style="color: black;background: #f3f5f7;">Zona</label>
+                    <select   style="text-align: center" id="tipoArchivo" class="form-select fz-10"  (change)="onChangeZona($event)" [(ngModel)]="idZonaSeleccionada" [disabled]="!cmb_zona_edit?.habilitar">
+                      <option   hidden>Selecccione</option>
+                      <ng-container *ngFor="let zona of dataZona">
+                        <option *ngIf="zona.estado==='A'" [value]="zona.id"> {{ zona.nombre}}</option>
+                      </ng-container>
+                    </select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="input-group mb-3" *ngIf="cmb_hacienda_edit?.visualizar">
+                  <label class="input-group-text" for="copia"
+                    style="color: black;background: #f3f5f7;width: 25%;">Hacienda</label>
+                    <select   style="text-align: center" id="plantilla" class="form-select fz-10" (change)="onChangeHacienda($event)" [(ngModel)]="idHaciendaSeleccionada" [disabled]="!cmb_hacienda_edit?.habilitar">
+                      <option  hidden>Selecccione</option>
+                      <ng-container *ngFor="let hacienda of dataHacienda">
+                        <option  *ngIf="hacienda.estado==='A'" [value]="hacienda.id">{{hacienda.nombre}}</option>
+                      </ng-container>
+                    </select>
+                </div>
+              </div>
+              
+              <div class="col-md-4" style="width: 24%;" *ngIf="cck_estado_edit?.visualizar">
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="estado" style="color: black;background-color: #f3f5f7;">Estado</label>
+                  <div class="form-check form-switch" style="padding-left: 20px;">
+                    <input style="color: black;margin-left: 0px;width: 55px;margin-top: 8px;"
+                      id="estado" size="10" class="form-check-input" type="checkbox"
+                      [checked]="estado_permiso" (change)="onEstadoChange($event)" [disabled]="!cck_estado_edit?.habilitar">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!--<div class="row" style="margin-bottom: 20px;">
+              <div class="col-md-5">
+                <div class="input-group mb-3">
+                  <app-date-picker label="Fecha inicio:"  [value]="fecha_inicio"  (change)="onFechaDesdeChange($event)"></app-date-picker>
+                </div>
+              </div>
+              <div class="col-md-5">
+                <div class="input-group mb-3">
+                  <app-date-picker label="Fecha fin:" [value]="fecha_fin"  (change)="onFechaHastaChange($event)"></app-date-picker>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="habilitar_noaceptar" style="color: black;background: rgb(227, 199, 22);">No aceptar</label>
+                  <div class="form-check form-switch" style="padding-left: 20px;">
+                    <input style="color: black;margin-left: 0px;width: 55px;margin-top: 8px;"
+                      id="estado" size="10" class="form-check-input" type="checkbox"
+                      [checked]="form.get('habilitar_noaceptar').value === true" (change)="onEstadoNoAceptarChange($event)">
+                  </div>
+                </div>
+              </div>
+            </div>-->
+            <div class="modal-footer">
+              <button *ngIf="btn_cancelar_edit?.visualizar" type="button" class="btn btn-secondary" (click)="modal.dismiss()" [disabled]="!btn_cancelar_edit?.habilitar">Cancelar</button>
+              <button *ngIf="btn_guardar_edit?.visualizar" type="submit" class="btn btn-amarillo" (click)="onSave()" [disabled]="!btn_guardar_edit?.habilitar"  >Guardar</button>
+            </div>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>
+
